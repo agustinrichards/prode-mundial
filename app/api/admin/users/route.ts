@@ -42,3 +42,12 @@ export async function GET(req: NextRequest) {
   );
   return NextResponse.json({ users });
 }
+
+export async function DELETE(req: NextRequest) {
+  const session = await getServerSession(authOptions);
+  if (!(session?.user as any)?.isAdmin)
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  const { userId } = await req.json();
+  await query("DELETE FROM users WHERE id=$1 AND is_admin=FALSE", [userId]);
+  return NextResponse.json({ ok: true });
+}

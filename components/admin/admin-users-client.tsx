@@ -48,6 +48,22 @@ export function AdminUsersClient({ users: initial }: { users: User[] }) {
     a.click();
   };
 
+const deleteUser = async (userId: string, name: string) => {
+  if (!confirm(`¿Eliminar a ${name}? Esta acción no se puede deshacer.`)) return;
+  try {
+    const res = await fetch("/api/admin/users", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId }),
+    });
+    if (!res.ok) throw new Error((await res.json()).error);
+    setUsers(u => u.filter(x => x.id !== userId));
+    toast({ title: `${name} eliminado` });
+  } catch (e: any) {
+    toast({ title: "Error", description: e.message, variant: "destructive" });
+  }
+};
+
   return (
     <div className="space-y-8 max-w-2xl">
       <div className="flex items-center justify-between">
@@ -78,13 +94,19 @@ export function AdminUsersClient({ users: initial }: { users: User[] }) {
       {/* User list */}
       <div className="space-y-2">
         {users.map(u => (
-          <div key={u.id} className="bg-white rounded-xl border px-4 py-3 flex items-center justify-between">
-            <div>
-              <span className="font-medium">{u.display_name}</span>
-              {u.is_admin && <span className="ml-2 text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">admin</span>}
-              <p className="text-xs text-gray-400">{u.email}</p>
-            </div>
-          </div>
+<div key={u.id} className="bg-white rounded-xl border px-4 py-3 flex items-center justify-between">
+  <div>
+    <span className="font-medium">{u.display_name}</span>
+    {u.is_admin && <span className="ml-2 text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">admin</span>}
+    <p className="text-xs text-gray-400">{u.email}</p>
+  </div>
+  {!u.is_admin && (
+    <button onClick={() => deleteUser(u.id, u.display_name)}
+      className="text-xs text-red-500 hover:text-red-700 hover:underline">
+      Eliminar
+    </button>
+  )}
+</div>
         ))}
       </div>
     </div>
