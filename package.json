@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "db:migrate": "node scripts/migrate.js"
+    "preinstall": "npm config set legacy-peer-deps true",
   },
   "dependencies": {
     "@auth/pg-adapter": "^1.0.0",
