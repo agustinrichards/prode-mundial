@@ -3,16 +3,16 @@ import { query } from "@/lib/db";
 import { AdminDashboardClient } from "@/components/admin/admin-dashboard-client";
 
 const DATE_LABELS = [
-  { key: "fecha_1", label: "Fecha 1" },
-  { key: "fecha_2", label: "Fecha 2" },
-  { key: "fecha_3", label: "Fecha 3" },
-  { key: "r32_1", label: "Ronda de 32" },
-  { key: "r16_1", label: "Octavos de Final" },
-  { key: "qf_1", label: "Cuartos de Final" },
-  { key: "sf_1", label: "Semifinales" },
-  { key: "3rd_place", label: "3er Puesto" },
-  { key: "final", label: "Final" },
-  { key: "especiales", label: "Especiales" },
+  { key: "fecha_1", label: "Fecha 1", matchField: "date_label" },
+  { key: "fecha_2", label: "Fecha 2", matchField: "date_label" },
+  { key: "fecha_3", label: "Fecha 3", matchField: "date_label" },
+  { key: "round_of_32", label: "Ronda de 32", matchField: "stage" },
+  { key: "round_of_16", label: "Octavos", matchField: "stage" },
+  { key: "quarterfinal", label: "Cuartos", matchField: "stage" },
+  { key: "semifinal", label: "Semis", matchField: "stage" },
+  { key: "third_place", label: "3er Puesto", matchField: "stage" },
+  { key: "final", label: "Final", matchField: "stage" },
+  { key: "especiales", label: "Especiales", matchField: "special" },
 ];
 
 export default async function AdminDashboardPage() {
@@ -21,32 +21,42 @@ export default async function AdminDashboardPage() {
   const users = await query(
     "SELECT id, display_name, email FROM users WHERE is_admin=FALSE ORDER BY display_name ASC"
   );
-
   const periods = await query("SELECT * FROM betting_periods ORDER BY date_label ASC");
 
-  // For each user and date_label, check if they have predictions
-  const predictionStatus = await query(`
-    SELECT 
-      p.user_id,
-      m.date_label,
-      COUNT(*) AS count,
-      COUNT(*) FILTER (WHERE p.locked = TRUE) AS locked_count,
-      COUNT(m2.id) AS total_matches
+  // Predictions by date_label
+  const predByDateLabel = await query(`
+    SELECT p.user_id, m.date_label, COUNT(*) AS count,
+      COUNT(*) FILTER (WHERE p.locked = TRUE) AS locked_count
     FROM matches m
     LEFT JOIN predictions p ON p.match_id = m.id
-    LEFT JOIN matches m2 ON m2.date_label = m.date_label AND m2.is_visible = TRUE
     WHERE m.is_visible = TRUE AND p.user_id IS NOT NULL
     GROUP BY p.user_id, m.date_label
   `);
 
-  // Total matches per date_label
-  const matchCounts = await query(`
+  // Predictions by stage
+  const predByStage = await query(`
+    SELECT p.user_id, m.stage, COUNT(*) AS count,
+      COUNT(*) FILTER (WHERE p.locked = TRUE) AS locked_count
+    FROM matches m
+    LEFT JOIN predictions p ON p.match_id = m.id
+    WHERE m.is_visible = TRUE AND p.user_id IS NOT NULL
+    GROUP BY p.user_id, m.stage
+  `);
+
+  // Match counts by date_label
+  const matchCountsByLabel = await query(`
     SELECT date_label, COUNT(*) AS total
     FROM matches WHERE is_visible = TRUE
     GROUP BY date_label
   `);
 
-  // Special bets status
+  // Match counts by stage
+  const matchCountsByStage = await query(`
+    SELECT stage, COUNT(*) AS total
+    FROM matches WHERE is_visible = TRUE
+    GROUP BY stage
+  `);
+
   const specialBets = await query(`
     SELECT user_id,
       champion_team IS NOT NULL AS has_champion,
@@ -65,8 +75,10 @@ export default async function AdminDashboardPage() {
       <AdminDashboardClient
         users={users}
         periods={periods}
-        predictionStatus={predictionStatus}
-        matchCounts={matchCounts}
+        predByDateLabel={predByDateLabel}
+        predByStage={predByStage}
+        matchCountsByLabel={matchCountsByLabel}
+        matchCountsByStage={matchCountsByStage}
         specialBets={specialBets}
         dateLabels={DATE_LABELS}
       />
