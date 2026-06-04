@@ -1,0 +1,137 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 97%;
+    --foreground: 0 0% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 11%;
+    --primary: 201 100% 36%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 0 0% 94%;
+    --secondary-foreground: 0 0% 20%;
+    --muted: 0 0% 95%;
+    --muted-foreground: 0 0% 46%;
+    --accent: 201 100% 36%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 88%;
+    --input: 0 0% 88%;
+    --ring: 201 100% 36%;
+    --radius: 0.75rem;
+    --font-display: 'Bebas Neue', sans-serif;
+    --font-body: 'DM Sans', sans-serif;
+    --agua-black: #1D1D1B;
+    --agua-blue: #0077B6;
+    --agua-light: #E8F4F8;
+  }
+
+  .dark {
+    --background: 0 0% 7%;
+    --foreground: 0 0% 95%;
+    --card: 0 0% 11%;
+    --card-foreground: 0 0% 95%;
+    --popover: 0 0% 11%;
+    --popover-foreground: 0 0% 95%;
+    --primary: 201 100% 45%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 0 0% 18%;
+    --secondary-foreground: 0 0% 80%;
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 55%;
+    --accent: 201 100% 45%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 75% 55%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 20%;
+    --input: 0 0% 20%;
+    --ring: 201 100% 45%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-body antialiased;
+  }
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    letter-spacing: 0.03em;
+  }
+}
+
+@layer components {
+  .match-card {
+    @apply relative overflow-hidden rounded-xl border bg-card p-4 transition-all duration-200 hover:shadow-lg;
+  }
+  .stage-badge {
+    @apply inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wider;
+  }
+  .score-input {
+    @apply h-12 w-12 rounded-lg border-2 border-border bg-muted text-center text-xl font-bold transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20;
+  }
+  .comodin-btn {
+    @apply inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-bold uppercase tracking-wider transition-all duration-150;
+  }
+  .comodin-btn.co2 {
+    @apply border-orange-300 bg-orange-50 text-orange-700 hover:bg-orange-100;
+  }
+  .comodin-btn.co2.active {
+    @apply border-orange-500 bg-orange-500 text-white shadow-lg shadow-orange-200;
+  }
+  .comodin-btn.rio {
+    @apply border-sky-300 bg-sky-50 text-sky-700 hover:bg-sky-100;
+  }
+  .comodin-btn.rio.active {
+    @apply border-sky-500 bg-sky-500 text-white shadow-lg shadow-sky-200;
+  }
+  .comodin-btn.lago {
+    @apply border-violet-300 bg-violet-50 text-violet-700 hover:bg-violet-100;
+  }
+  .comodin-btn.lago.active {
+    @apply border-violet-500 bg-violet-500 text-white shadow-lg shadow-violet-200;
+  }
+  .lb-row {
+    @apply flex items-center gap-3 rounded-xl p-3 transition-colors hover:bg-muted/50;
+  }
+  .lb-row.top-1 { @apply bg-amber-50; }
+  .lb-row.top-2 { @apply bg-zinc-50; }
+  .lb-row.top-3 { @apply bg-orange-50; }
+  .lb-row.self-row { @apply bg-primary/5 ring-1 ring-primary/20; }
+  .points-exact   { @apply text-emerald-600; }
+  .points-diff    { @apply text-sky-600; }
+  .points-result  { @apply text-amber-600; }
+  .points-miss    { @apply text-rose-500; }
+
+  /* Agua Local header */
+  .agua-header {
+    background-color: var(--agua-black);
+    color: white;
+  }
+  .agua-logo-text {
+    font-family: var(--font-display);
+    letter-spacing: 0.05em;
+  }
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-slide-up {
+  animation: slide-up 0.3s ease-out forwards;
+}
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { @apply bg-muted; }
+::-webkit-scrollbar-thumb { @apply rounded-full bg-border; }
+::-webkit-scrollbar-thumb:hover { @apply bg-muted-foreground/50; }
