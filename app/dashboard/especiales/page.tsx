@@ -18,16 +18,19 @@ export default async function EspecialesPage() {
   const session = await requireAuth();
   const user = session.user as any;
   if (user.isAdmin) redirect("/admin/matches");
-
   const userId = user.id;
 
   const specialBets = await queryOne("SELECT * FROM special_bets WHERE user_id=$1", [userId]);
-  const firstMatch = await queryOne("SELECT predictions_close_at FROM matches WHERE date_label='fecha_1' ORDER BY predictions_close_at ASC LIMIT 1");
-  
-  const groupMatches = await query("SELECT DISTINCT match_date::date AS d FROM matches WHERE stage='group' ORDER BY d ASC");
-  const groupMatchDays = groupMatches
-  .map((m: any) => toDateString(m.d))
-  .filter((d: string) => Boolean(d) && d.length === 10 && !isNaN(new Date(d + "T12:00:00").getTime()));
+
+  // Cierre basado en betting_periods de fecha_1
+  const period = await queryOne("SELECT is_open FROM betting_periods WHERE date_label='fecha_1'");
+  const closed = period ? !period.is_open : true;
+
+  // Todos los días del mundial con partidos (no solo grupos)
+  const allMatchDays = await query("SELECT DISTINCT match_date::date AS d FROM matches WHERE is_visible=TRUE ORDER BY d ASC");
+  const groupMatchDays = allMatchDays
+    .map((m: any) => toDateString(m.d))
+    .filter((d: string) => Boolean(d) && d.length === 10 && !isNaN(new Date(d + "T12:00:00").getTime()));
 
   const waterUpdates = await query("SELECT * FROM water_updates ORDER BY week_number ASC");
   const allWaterBets = await query(`
@@ -37,10 +40,6 @@ export default async function EspecialesPage() {
     ORDER BY u.display_name ASC
   `);
 
-  const now = new Date();
-  const closed = firstMatch ? new Date(firstMatch.predictions_close_at) < now : false;
-
-  // Convert lago_day to string
   const lagoDay = specialBets?.lago_day ? toDateString(specialBets.lago_day) : null;
 
   return (
@@ -49,7 +48,7 @@ export default async function EspecialesPage() {
         <h1 className="text-4xl font-display">APUESTAS ESPECIALES</h1>
         <p className="text-muted-foreground mt-1">Se cierran junto con la Fecha 1 de grupos</p>
       </div>
-      <SpecialBetsClient userId={userId} initialBets={specialBets} teams={TEAMS} closed={closed} closeDate={firstMatch?.predictions_close_at ?? null} />
+      <SpecialBetsClient userId={userId} initialBets={specialBets} teams={TEAMS} closed={closed} closeDate={null} />
       <LagoSelector userId={userId} currentLagoDay={lagoDay} groupMatchDays={groupMatchDays} isLocked={closed} />
       <WaterBetClient userId={userId} currentBet={specialBets?.water_installations ?? null} closed={closed} updates={waterUpdates} allBets={allWaterBets} />
     </div>
