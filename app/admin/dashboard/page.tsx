@@ -1,6 +1,7 @@
 import { requireAdmin } from "@/lib/auth/session";
 import { query } from "@/lib/db";
 import { AdminDashboardClient } from "@/components/admin/admin-dashboard-client";
+import { serializeDates } from "@/lib/serialize";
 
 const DATE_LABELS = [
   { key: "fecha_1", label: "Fecha 1", matchField: "date_label" },
@@ -21,9 +22,9 @@ export default async function AdminDashboardPage() {
   const users = await query(
     "SELECT id, display_name, email FROM users WHERE is_admin=FALSE ORDER BY display_name ASC"
   );
-  const periods = await query("SELECT * FROM betting_periods ORDER BY date_label ASC");
+  const periodsRaw = await query("SELECT * FROM betting_periods ORDER BY date_label ASC");
+  const periods = serializeDates(periodsRaw, ["created_at", "updated_at", "opens_at", "closes_at"]);
 
-  // Predictions by date_label
   const predByDateLabel = await query(`
     SELECT p.user_id, m.date_label, COUNT(*) AS count,
       COUNT(*) FILTER (WHERE p.locked = TRUE) AS locked_count
@@ -33,7 +34,6 @@ export default async function AdminDashboardPage() {
     GROUP BY p.user_id, m.date_label
   `);
 
-  // Predictions by stage
   const predByStage = await query(`
     SELECT p.user_id, m.stage, COUNT(*) AS count,
       COUNT(*) FILTER (WHERE p.locked = TRUE) AS locked_count
@@ -43,14 +43,12 @@ export default async function AdminDashboardPage() {
     GROUP BY p.user_id, m.stage
   `);
 
-  // Match counts by date_label
   const matchCountsByLabel = await query(`
     SELECT date_label, COUNT(*) AS total
     FROM matches WHERE is_visible = TRUE
     GROUP BY date_label
   `);
 
-  // Match counts by stage
   const matchCountsByStage = await query(`
     SELECT stage, COUNT(*) AS total
     FROM matches WHERE is_visible = TRUE
