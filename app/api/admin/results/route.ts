@@ -43,16 +43,14 @@ export async function POST(req: NextRequest) {
       await client.query("UPDATE rio_predictions SET points=$1, updated_at=NOW() WHERE id=$2", [pts, pred.id]);
     }
 
-    // Recalculate leaderboard — incluye puntos RIO si son mejores que la pred original
+    // Recalculate leaderboard
     const users = await client.query("SELECT DISTINCT user_id FROM predictions WHERE match_id=$1", [matchId]);
     for (const { user_id } of users.rows) {
-      // Suma de puntos de predicciones normales
       const normalPts = await client.query(
         "SELECT COALESCE(SUM(points),0) AS total, COUNT(*) FILTER (WHERE points IS NOT NULL) AS predicted, COUNT(*) FILTER (WHERE points>0) AS correct FROM predictions WHERE user_id=$1 AND points IS NOT NULL",
         [user_id]
       );
 
-      // Suma de puntos RIO extra (solo cuando RIO supera a la pred original)
       const rioPtsResult = await client.query(
         `SELECT COALESCE(SUM(
           GREATEST(rp.points, COALESCE(p.points, 0)) - COALESCE(p.points, 0)
@@ -94,3 +92,24 @@ export async function POST(req: NextRequest) {
       for (let i = 0; i < snap.rows.length; i++) {
         await client.query(
           "INSERT INTO leaderboard_snapshots (snapshot_date,user_id,total_points,rank) VALUES($1,$2,$3,$4) ON CONFLICT(snapshot_date,user_id) DO UPDATE SET total_points=$3,rank=$4",
+          [day, snap.rows[i].user_id, snap.rows[i].total_points, i + 1]
+        );
+      }
+    }
+
+    await client.query("COMMIT");
+    return NextResponse.json({ ok: true });
+  } catch (e: any) {
+    await client.query("ROLLBACK");
+    return NextResponse.json({ error: e.message }, { status: 500 });
+  } finally {
+    client.release();
+  }
+}
+
+function calcPts(hp: number, ap: number, hr: number, ar: number) {
+  if (hp === hr && ap === ar) return 3;
+  const pd = hp - ap, rd = hr - ar;
+  if (Math.sign(pd) === Math.sign(rd)) return 1;
+  return 0;
+}
