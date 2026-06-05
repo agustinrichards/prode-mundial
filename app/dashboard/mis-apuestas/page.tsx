@@ -61,7 +61,7 @@ export default async function VerTarjetasPage() {
   }));
 
   const serializedSpecialBets = specialBets.map((b: any) => ({
-    ...b,WHERE m.is_visible=TRUE AND m.predictions_close_at < NOW()
+    ...b,
     lago_day: serializeDate(b.lago_day),
   }));
 
