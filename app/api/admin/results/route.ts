@@ -26,44 +26,49 @@ export async function POST(req: NextRequest) {
     const preds = await client.query("SELECT * FROM predictions WHERE match_id=$1", [matchId]);
     const rioPreds = await client.query("SELECT * FROM rio_predictions WHERE match_id=$1", [matchId]);
 
+    // Calcular puntos base para predicciones normales
     for (const pred of preds.rows) {
       const pts = calcPts(pred.home_score_pred, pred.away_score_pred, effectiveHome, effectiveAway);
-      const co2 = await client.query(
-        "SELECT 1 FROM comodin_usage WHERE user_id=$1 AND match_id=$2 AND comodin_type='CO2'",
-        [pred.user_id, matchId]
-      );
       await client.query(
         "UPDATE predictions SET points=$1, updated_at=NOW() WHERE id=$2",
-        [co2.rowCount! > 0 ? pts * 2 : pts, pred.id]
+        [pts, pred.id]
       );
     }
 
+    // Calcular puntos RIO
     for (const pred of rioPreds.rows) {
       const pts = calcPts(pred.home_score_pred, pred.away_score_pred, effectiveHome, effectiveAway);
       await client.query("UPDATE rio_predictions SET points=$1, updated_at=NOW() WHERE id=$2", [pts, pred.id]);
     }
 
+    // Aplicar MAX(pred, rio) y CO2 sobre el mejor
+    for (const pred of preds.rows) {
+      const rioPred = rioPreds.rows.find((r: any) => r.user_id === pred.user_id);
+      const co2 = await client.query(
+        "SELECT 1 FROM comodin_usage WHERE user_id=$1 AND match_id=$2 AND comodin_type='CO2'",
+        [pred.user_id, matchId]
+      );
+      const hasCo2 = co2.rowCount! > 0;
+
+      const predPts = calcPts(pred.home_score_pred, pred.away_score_pred, effectiveHome, effectiveAway);
+      const rioPts = rioPred ? calcPts(rioPred.home_score_pred, rioPred.away_score_pred, effectiveHome, effectiveAway) : -1;
+      const bestPts = Math.max(predPts, rioPts);
+      const finalPts = hasCo2 ? bestPts * 2 : bestPts;
+
+      await client.query(
+        "UPDATE predictions SET points=$1, updated_at=NOW() WHERE id=$2",
+        [finalPts, pred.id]
+      );
+    }
+
     // Recalculate leaderboard
     const users = await client.query("SELECT DISTINCT user_id FROM predictions WHERE match_id=$1", [matchId]);
     for (const { user_id } of users.rows) {
-      const normalPts = await client.query(
+      const t = await client.query(
         "SELECT COALESCE(SUM(points),0) AS total, COUNT(*) FILTER (WHERE points IS NOT NULL) AS predicted, COUNT(*) FILTER (WHERE points>0) AS correct FROM predictions WHERE user_id=$1 AND points IS NOT NULL",
         [user_id]
       );
-
-      const rioPtsResult = await client.query(
-        `SELECT COALESCE(SUM(
-          GREATEST(rp.points, COALESCE(p.points, 0)) - COALESCE(p.points, 0)
-        ), 0) AS rio_bonus
-        FROM rio_predictions rp
-        LEFT JOIN predictions p ON p.user_id = rp.user_id AND p.match_id = rp.match_id
-        WHERE rp.user_id=$1 AND rp.points IS NOT NULL`,
-        [user_id]
-      );
-
-      const total = Number(normalPts.rows[0].total) + Number(rioPtsResult.rows[0].rio_bonus);
-      const predicted = Number(normalPts.rows[0].predicted);
-      const correct = Number(normalPts.rows[0].correct);
+      const { total, predicted, correct } = t.rows[0];
 
       await client.query(
         "INSERT INTO leaderboard_cache (user_id,total_points,matches_predicted,correct_results,updated_at) VALUES($1,$2,$3,$4,NOW()) ON CONFLICT(user_id) DO UPDATE SET total_points=$2,matches_predicted=$3,correct_results=$4,updated_at=NOW()",
