@@ -29,6 +29,7 @@ const CHAMP_OPTIONS = [
 export function AdminSpecialResultsClient({ config, bets }: Props) {
   const { toast } = useToast();
   const [saving, setSaving] = useState(false);
+const [savedUsers, setSavedUsers] = useState<Set<string>>(new Set());
   const [calculating, setCalculating] = useState(false);
   const [champForm, setChampForm] = useState({
     champion_team: config?.champion_team ?? "",
@@ -83,6 +84,7 @@ export function AdminSpecialResultsClient({ config, bets }: Props) {
       });
       if (!res.ok) throw new Error((await res.json()).error);
       toast({ title: "Puntos de goleador guardados" });
+setSavedUsers(new Set(Object.keys(scorerResults).filter(k => scorerResults[k] !== "")));
     } catch (e: any) {
       toast({ title: "Error", description: e.message, variant: "destructive" });
     } finally {
@@ -138,27 +140,42 @@ export function AdminSpecialResultsClient({ config, bets }: Props) {
         </button>
       </div>
 
-      {/* Goleador */}
+{/* Goleador */}
       <div className="bg-white rounded-xl border p-5 space-y-4">
         <h2 className="font-semibold">⚽ Goleador — asignar por jugador</h2>
         <div className="space-y-3">
-          {bets.map(b => (
-            <div key={b.user_id} className="flex items-center justify-between gap-3 py-2 border-b border-gray-50 last:border-0">
-              <div className="flex-1">
-                <p className="text-sm font-medium text-gray-900">{b.display_name}</p>
-                <p className="text-xs text-gray-400">{b.top_scorer_name || "Sin apuesta"}</p>
+          {bets.map(b => {
+            const isSaved = savedUsers.has(b.user_id);
+            return (
+              <div key={b.user_id} className={`flex items-center justify-between gap-3 py-2 border-b border-gray-50 last:border-0 ${isSaved ? "bg-green-50 rounded-lg px-2" : ""}`}>
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-gray-900">{b.display_name}</p>
+                  <p className="text-xs text-gray-400">{b.top_scorer_name || "Sin apuesta"}</p>
+                </div>
+                {isSaved ? (
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-green-600 font-medium">
+                      ✓ {SCORER_OPTIONS.find(o => o.value === scorerResults[b.user_id])?.label ?? "Guardado"}
+                    </span>
+                    <button onClick={() => setSavedUsers(prev => { const s = new Set(prev); s.delete(b.user_id); return s; })}
+                      className="text-xs text-gray-400 hover:text-orange-500 transition-colors">
+                      Editar
+                    </button>
+                  </div>
+                ) : (
+                  <select
+                    value={scorerResults[b.user_id] ?? ""}
+                    onChange={e => setScorerResults(r => ({ ...r, [b.user_id]: e.target.value }))}
+                    className="border rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                  >
+                    {SCORER_OPTIONS.map(o => (
+                      <option key={o.value} value={o.value}>{o.label}</option>
+                    ))}
+                  </select>
+                )}
               </div>
-              <select
-                value={scorerResults[b.user_id] ?? ""}
-                onChange={e => setScorerResults(r => ({ ...r, [b.user_id]: e.target.value }))}
-                className="border rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-              >
-                {SCORER_OPTIONS.map(o => (
-                  <option key={o.value} value={o.value}>{o.label}</option>
-                ))}
-              </select>
-            </div>
-          ))}
+            );
+          })}
         </div>
         <button onClick={handleSaveScorer} disabled={saving}
           className="px-5 py-2 bg-blue-600 text-white rounded-lg font-medium text-sm hover:bg-blue-700 disabled:opacity-50">
