@@ -35,7 +35,7 @@ export default async function VerTarjetasPage() {
       EXISTS(SELECT 1 FROM comodin_usage WHERE user_id=u.id AND match_id=m.id AND comodin_type='CO2') AS co2,
       EXISTS(SELECT 1 FROM comodin_usage WHERE user_id=u.id AND match_id=m.id AND comodin_type='RIO') AS rio
     FROM matches m JOIN predictions p ON p.match_id=m.id JOIN users u ON u.id=p.user_id
-    WHERE m.is_visible=TRUE AND m.predictions_close_at < NOW()
+    WHERE m.is_visible=TRUE
     ORDER BY m.match_date ASC, u.display_name ASC
   `);
 
@@ -61,7 +61,7 @@ export default async function VerTarjetasPage() {
   }));
 
   const serializedSpecialBets = specialBets.map((b: any) => ({
-    ...b,
+    ...b,WHERE m.is_visible=TRUE AND m.predictions_close_at < NOW()
     lago_day: serializeDate(b.lago_day),
   }));
 
