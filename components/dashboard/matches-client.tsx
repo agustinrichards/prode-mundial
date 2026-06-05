@@ -79,6 +79,7 @@ export function MatchesClient({ matches, userId, co2Usage, rioUsage, periods }: 
 
 const isClosed = (m: Match) => {
   const period = periods.find(p => p.date_label === m.date_label);
+  console.log("isClosed", m.date_label, "period:", period, "result:", period ? !period.is_open : true);
   if (period) return !period.is_open;
   return true;
 };
