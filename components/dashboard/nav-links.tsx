@@ -13,6 +13,7 @@ const userLinks = [
   { href: '/dashboard/especiales', label: 'Apuestas Especiales', icon: Star },
   { href: '/dashboard/mis-apuestas', label: 'Ver Tarjetas', icon: Eye },
   { href: '/leaderboard', label: 'Tabla de Posiciones', icon: BarChart3 },
+  { href: '/dashboard/agua-local', label: 'Instalaciones Agua Local', icon: Droplets },
 ];
 
 const adminLinks = [
