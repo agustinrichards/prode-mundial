@@ -14,7 +14,8 @@ export async function GET(req: NextRequest) {
     SELECT
       u.id AS user_id,
       u.display_name,
-      ls.total_points,
+      COALESCE(SUM(p.points) FILTER (WHERE p.points IS NOT NULL AND m.match_date::date <= $1::date), 0) +
+        COALESCE(sb_pts.special_points, 0) AS total_points,
       COALESCE(sb_pts.special_points, 0) AS special_points,
       COUNT(p.id) FILTER (WHERE p.points IS NOT NULL AND m.match_date::date <= $1::date) AS matches_predicted,
       COUNT(p.id) FILTER (
@@ -47,8 +48,8 @@ export async function GET(req: NextRequest) {
       FROM special_bets
     ) sb_pts ON sb_pts.user_id = u.id
     WHERE ls.snapshot_date = $1 AND u.is_admin = FALSE
-    GROUP BY u.id, u.display_name, ls.total_points, ls.rank, sb_pts.special_points
-    ORDER BY ls.rank ASC, ls.total_points DESC
+    GROUP BY u.id, u.display_name, ls.rank, sb_pts.special_points
+    ORDER BY total_points DESC, exact_results DESC
   `, [date]);
 
   const serialized = rows.map((r: any) => ({
