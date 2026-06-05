@@ -1,25 +1,28 @@
 import { requireAuth } from "@/lib/auth/session";
 import { query } from "@/lib/db";
 import { MatchesClient } from "@/components/dashboard/matches-client";
-import { redirect } from "next/navigation";
+
+function serializeDate(val: any): string {
+  if (!val) return "";
+  if (val instanceof Date) return val.toISOString();
+  return String(val);
+}
 
 export default async function DashboardPage() {
   const session = await requireAuth();
-  const user = session.user as any;
-
-  // Admin goes to admin area
-  if (user.isAdmin) redirect("/admin/matches");
-
-  const userId = user.id;
+  const userId = (session.user as any).id;
 
   const matches = await query(`
     SELECT
       m.*,
-      p.home_score_pred, p.away_score_pred, p.points, p.id AS prediction_id,
-      COALESCE(p.locked, FALSE) AS locked,
+      p.home_score_pred,
+      p.away_score_pred,
+      p.points,
+      p.id AS prediction_id,
       EXISTS(SELECT 1 FROM comodin_usage WHERE user_id=$1 AND match_id=m.id AND comodin_type='CO2') AS co2_used,
       EXISTS(SELECT 1 FROM comodin_usage WHERE user_id=$1 AND match_id=m.id AND comodin_type='RIO') AS rio_used,
-      rp.home_score_pred AS rio_home_pred, rp.away_score_pred AS rio_away_pred
+      rp.home_score_pred AS rio_home_pred,
+      rp.away_score_pred AS rio_away_pred
     FROM matches m
     LEFT JOIN predictions p ON p.match_id=m.id AND p.user_id=$1
     LEFT JOIN rio_predictions rp ON rp.match_id=m.id AND rp.user_id=$1
@@ -39,13 +42,19 @@ export default async function DashboardPage() {
     WHERE cu.user_id=$1 AND cu.comodin_type='RIO' GROUP BY m.stage
   `, [userId]);
 
+  const serializedMatches = matches.map((m: any) => ({
+    ...m,
+    match_date: serializeDate(m.match_date),
+    predictions_close_at: serializeDate(m.predictions_close_at),
+  }));
+
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-4xl font-display">PREDICCIONES</h1>
-        <p className="text-muted-foreground mt-1">Mundial FIFA 2026 · 11 Jun – 19 Jul</p>
+        <p className="text-muted-foreground mt-1">Mundial FIFA 2026 · 11 Jun - 19 Jul</p>
       </div>
-      <MatchesClient matches={matches} userId={userId} co2Usage={co2Usage} rioUsage={rioUsage} />
+      <MatchesClient matches={serializedMatches} userId={userId} co2Usage={co2Usage} rioUsage={rioUsage} />
     </div>
   );
 }
