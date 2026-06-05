@@ -25,7 +25,9 @@ export default async function EspecialesPage() {
   const firstMatch = await queryOne("SELECT predictions_close_at FROM matches WHERE date_label='fecha_1' ORDER BY predictions_close_at ASC LIMIT 1");
   
   const groupMatches = await query("SELECT DISTINCT match_date::date AS d FROM matches WHERE stage='group' ORDER BY d ASC");
-  const groupMatchDays = groupMatches.map((m: any) => toDateString(m.d)).filter(Boolean);
+  const groupMatchDays = groupMatches
+  .map((m: any) => toDateString(m.d))
+  .filter((d: string) => Boolean(d) && d.length === 10 && !isNaN(new Date(d + "T12:00:00").getTime()));
 
   const waterUpdates = await query("SELECT * FROM water_updates ORDER BY week_number ASC");
   const allWaterBets = await query(`
