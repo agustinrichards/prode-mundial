@@ -4,6 +4,12 @@ import { LeaderboardClient } from "@/components/leaderboard/leaderboard-client";
 
 export const revalidate = 30;
 
+function serializeDate(val: any): string {
+  if (!val) return "";
+  if (val instanceof Date) return val.toISOString();
+  return String(val);
+}
+
 export default async function LeaderboardPage() {
   const session = await requireAuth();
   const currentUserId = (session.user as any).id;
@@ -21,13 +27,23 @@ export default async function LeaderboardPage() {
     ORDER BY snapshot_date DESC
   `);
 
+  const serializedRows = rows.map((r: any) => ({
+    ...r,
+    updated_at: serializeDate(r.updated_at),
+  }));
+
+  const serializedSnapshots = snapshots.map((s: any) => ({
+    ...s,
+    snapshot_date: serializeDate(s.snapshot_date),
+  }));
+
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-4xl font-display">TABLA DE POSICIONES</h1>
         <p className="text-muted-foreground mt-1">Se actualiza automáticamente</p>
       </div>
-      <LeaderboardClient rows={rows} currentUserId={currentUserId} snapshots={snapshots} />
+      <LeaderboardClient rows={serializedRows} currentUserId={currentUserId} snapshots={serializedSnapshots} />
     </div>
   );
 }
