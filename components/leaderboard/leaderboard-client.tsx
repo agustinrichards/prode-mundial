@@ -95,7 +95,6 @@ export function LeaderboardClient({ rows: initialRows, currentUserId, snapshots 
               <th className="text-left px-4 py-3 font-semibold text-gray-600">Jugador</th>
               <th className="text-right px-3 py-3 font-semibold text-gray-600">Pts</th>
               <th className="text-right px-3 py-3 font-semibold text-gray-600 hidden lg:table-cell">Exactos</th>
-              <th className="text-right px-3 py-3 font-semibold text-gray-600 hidden lg:table-cell">Dif Gol</th>
               <th className="text-right px-3 py-3 font-semibold text-gray-600 hidden lg:table-cell">Simples</th>
               <th className="text-right px-3 py-3 font-semibold text-gray-600 hidden md:table-cell">CO2</th>
               <th className="text-right px-3 py-3 font-semibold text-gray-600 hidden md:table-cell">Especiales</th>
@@ -119,7 +118,6 @@ export function LeaderboardClient({ rows: initialRows, currentUserId, snapshots 
                   </td>
                   <td className="px-3 py-3 text-right font-bold text-gray-900">{row.total_points}</td>
                   <td className="px-3 py-3 text-right text-green-700 font-medium hidden lg:table-cell">{row.exact_results}</td>
-                  <td className="px-3 py-3 text-right text-blue-700 font-medium hidden lg:table-cell">{row.diff_results}</td>
                   <td className="px-3 py-3 text-right text-yellow-700 font-medium hidden lg:table-cell">{row.simple_results}</td>
                   <td className="px-3 py-3 text-right text-orange-600 hidden md:table-cell">
                     {row.co2_points > 0 ? `+${row.co2_points}` : "—"}
