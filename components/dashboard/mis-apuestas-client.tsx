@@ -297,7 +297,7 @@ export function MisApuestasClient({ myPredictions, allPredictions, specialBets, 
                 <div className="flex items-start justify-between mb-2">
                   <div>
                     <span className="text-xs text-gray-400">
-                      {format(new Date(match.match_date), "EEE d MMM · HH:mm", { locale: es })}
+                      {format(new Date(String(match.match_date)), "EEE d MMM · HH:mm", { locale: es })}
                       {match.group_name && <span className="ml-1.5">· Grupo {match.group_name}</span>}
                     </span>
                     {(match.venue || match.city) && (
