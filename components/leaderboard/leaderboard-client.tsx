@@ -64,15 +64,10 @@ export function LeaderboardClient({ rows: initialRows, currentUserId, snapshots 
 
   return (
     <div className="space-y-4">
-      {/* Date selector */}
       {snapshots.length > 0 && (
         <div className="flex items-center gap-2 flex-wrap">
           <span className="text-sm text-gray-500">Ver tabla al:</span>
-          <button onClick={() => loadSnapshot("current")}
-            className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
-              selectedDate === "current" ? "bg-primary text-white" : "bg-white border border-gray-200 text-gray-600 hover:border-primary/40"
-            }`}>
-            {snapshots.map(s => (
+          {snapshots.map(s => (
             <button key={s.snapshot_date} onClick={() => loadSnapshot(s.snapshot_date)}
               className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
                 selectedDate === s.snapshot_date ? "bg-primary text-white" : "bg-white border border-gray-200 text-gray-600 hover:border-primary/40"
@@ -124,7 +119,7 @@ export function LeaderboardClient({ rows: initialRows, currentUserId, snapshots 
               );
             })}
             {rows.length === 0 && (
-              <tr><td colSpan={6} className="px-4 py-8 text-center text-gray-400">Aún no hay puntos cargados</td></tr>
+              <tr><td colSpan={6} className="px-4 py-8 text-center text-gray-400">Aun no hay puntos cargados</td></tr>
             )}
           </tbody>
         </table>
