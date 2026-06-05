@@ -3,11 +3,16 @@ import { query } from "@/lib/db";
 import { MisApuestasClient } from "@/components/dashboard/mis-apuestas-client";
 import { redirect } from "next/navigation";
 
+function serializeDate(val: any): string {
+  if (!val) return "";
+  if (val instanceof Date) return val.toISOString();
+  return String(val);
+}
+
 export default async function VerTarjetasPage() {
   const session = await requireAuth();
   const user = session.user as any;
   if (user.isAdmin) redirect("/admin/matches");
-
   const userId = user.id;
 
   const myPredictions = await query(`
@@ -49,14 +54,21 @@ export default async function VerTarjetasPage() {
     "SELECT id, display_name FROM users WHERE is_admin=FALSE ORDER BY display_name ASC"
   );
 
+  // Serializar fechas antes de pasar al client component
+  const serializedMyPredictions = myPredictions.map((m: any) => ({
+    ...m,
+    match_date: serializeDate(m.match_date),
+    predictions_close_at: serializeDate(m.predictions_close_at),
+  }));
+
+  const serializedSpecialBets = specialBets.map((b: any) => ({
+    ...b,
+    lago_day: serializeDate(b.lago_day),
+  }));
+
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-4xl font-display">VER TARJETAS</h1>
         <p className="text-muted-foreground mt-1">Predicciones de todos · visibles tras el cierre de cada fecha</p>
       </div>
-      <MisApuestasClient myPredictions={myPredictions} allPredictions={allPredictions}
-        specialBets={specialBets} users={users} userId={userId} />
-    </div>
-  );
-}
