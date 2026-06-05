@@ -7,8 +7,20 @@ export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!(session?.user as any)?.isAdmin) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
-  const { userId, matchId, unlockAll, dateLabel, unlockResult } = await req.json();
+  const { userId, matchId, unlockAll, dateLabel, unlockResult, resetStage } = await req.json();
 
+  // Reset all results for a stage
+  if (resetStage) {
+    const matches = await query("SELECT id FROM matches WHERE stage=$1", [resetStage]);
+    for (const m of matches as any[]) {
+      await query("UPDATE matches SET home_score=NULL, away_score=NULL, updated_at=NOW() WHERE id=$1", [m.id]);
+      await query("UPDATE predictions SET points=NULL WHERE match_id=$1", [m.id]);
+      await query("UPDATE rio_predictions SET points=NULL WHERE match_id=$1", [m.id]);
+    }
+    return NextResponse.json({ ok: true });
+  }
+
+  // Reset single match result
   if (unlockResult && matchId) {
     await query("UPDATE matches SET home_score=NULL, away_score=NULL, updated_at=NOW() WHERE id=$1", [matchId]);
     await query("UPDATE predictions SET points=NULL WHERE match_id=$1", [matchId]);

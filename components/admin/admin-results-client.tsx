@@ -168,9 +168,32 @@ export function AdminResultsClient({ matches: initialMatches }: { matches: Match
 
       {sortedStages.map(stage => (
         <div key={stage}>
-          <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">
-            {STAGE_LABELS[stage] ?? stage}
-          </h2>
+          <div className="flex items-center justify-between mb-3">
+  <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider">
+    {STAGE_LABELS[stage] ?? stage}
+  </h2>
+  <button
+    onClick={async () => {
+      if (!confirm(`¿Resetear todos los resultados de ${STAGE_LABELS[stage] ?? stage}?`)) return;
+      try {
+        const res = await fetch("/api/admin/unlock", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ resetStage: stage }),
+        });
+        if (!res.ok) throw new Error((await res.json()).error);
+        setMatches(ms => ms.map(m => m.stage === stage ? { ...m, home_score: null, away_score: null } : m));
+        setLocked(prev => { const s = new Set(prev); matches.filter(m => m.stage === stage).forEach(m => s.delete(m.id)); return s; });
+        toast({ title: `✓ Resultados de ${STAGE_LABELS[stage] ?? stage} reseteados` });
+      } catch (e: any) {
+        toast({ title: "Error", description: e.message, variant: "destructive" });
+      }
+    }}
+    className="text-xs text-red-400 hover:text-red-600 transition-colors"
+  >
+    Resetear fase
+  </button>
+</div>
           <div className="space-y-3">
             {grouped[stage].map(match => {
               const r = getR(match.id, match);
