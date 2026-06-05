@@ -35,6 +35,7 @@ interface Props {
   userId: string;
   co2Usage: any[];
   rioUsage: any[];
+  periods: { date_label: string; is_open: boolean }[];
 }
 
 const CO2_LIMITS: Record<string, number> = { group: 6, round_of_32: 2, round_of_16: 1 };
@@ -64,7 +65,7 @@ function formatMatchDate(val: string | null | undefined): string {
   return format(d, "EEE d MMM · HH:mm", { locale: es });
 }
 
-export function MatchesClient({ matches, userId, co2Usage, rioUsage }: Props) {
+export function MatchesClient({ matches, userId, co2Usage, rioUsage, periods }: Props) {
   const { toast } = useToast();
   const [inputs, setInputs] = useState<Record<string, { home: string; away: string; rioHome: string; rioAway: string }>>({});
   const [saving, setSaving] = useState<Record<string, boolean>>({});
@@ -76,11 +77,11 @@ export function MatchesClient({ matches, userId, co2Usage, rioUsage }: Props) {
   );
   const [activeTab, setActiveTab] = useState(TAB_GROUPS[0].key);
 
-  const now = new Date();
-  const isClosed = (m: Match) => {
-    const d = safeParseDate(m.predictions_close_at);
-    return d ? isBefore(d, now) : false;
-  };
+const isClosed = (m: Match) => {
+  const period = periods.find(p => p.date_label === m.date_label);
+  if (period) return !period.is_open;
+  return true;
+};
 
   const getInput = (m: Match) => inputs[m.id] ?? {
     home: m.home_score_pred?.toString() ?? "",

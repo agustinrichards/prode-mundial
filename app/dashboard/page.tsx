@@ -19,6 +19,7 @@ export default async function DashboardPage() {
       p.away_score_pred,
       p.points,
       p.id AS prediction_id,
+      COALESCE(p.locked, FALSE) AS locked,
       EXISTS(SELECT 1 FROM comodin_usage WHERE user_id=$1 AND match_id=m.id AND comodin_type='CO2') AS co2_used,
       EXISTS(SELECT 1 FROM comodin_usage WHERE user_id=$1 AND match_id=m.id AND comodin_type='RIO') AS rio_used,
       rp.home_score_pred AS rio_home_pred,
@@ -42,6 +43,8 @@ export default async function DashboardPage() {
     WHERE cu.user_id=$1 AND cu.comodin_type='RIO' GROUP BY m.stage
   `, [userId]);
 
+  const periods = await query("SELECT date_label, is_open FROM betting_periods");
+
   const serializedMatches = matches.map((m: any) => ({
     ...m,
     match_date: serializeDate(m.match_date),
@@ -54,7 +57,13 @@ export default async function DashboardPage() {
         <h1 className="text-4xl font-display">PREDICCIONES</h1>
         <p className="text-muted-foreground mt-1">Mundial FIFA 2026 · 11 Jun - 19 Jul</p>
       </div>
-      <MatchesClient matches={serializedMatches} userId={userId} co2Usage={co2Usage} rioUsage={rioUsage} />
+      <MatchesClient
+        matches={serializedMatches}
+        userId={userId}
+        co2Usage={co2Usage}
+        rioUsage={rioUsage}
+        periods={periods}
+      />
     </div>
   );
 }
