@@ -30,11 +30,13 @@ export default async function VerTarjetasPage() {
   `, [userId]);
 
   const allPredictions = await query(`
-    SELECT m.id AS match_id, u.display_name, u.id AS user_id,
+SELECT m.id AS match_id, u.display_name, u.id AS user_id,
       p.home_score_pred, p.away_score_pred, p.points,
       EXISTS(SELECT 1 FROM comodin_usage WHERE user_id=u.id AND match_id=m.id AND comodin_type='CO2') AS co2,
-      EXISTS(SELECT 1 FROM comodin_usage WHERE user_id=u.id AND match_id=m.id AND comodin_type='RIO') AS rio
+      EXISTS(SELECT 1 FROM comodin_usage WHERE user_id=u.id AND match_id=m.id AND comodin_type='RIO') AS rio,
+      rp.home_score_pred AS rio_home, rp.away_score_pred AS rio_away
     FROM matches m JOIN predictions p ON p.match_id=m.id JOIN users u ON u.id=p.user_id
+    LEFT JOIN rio_predictions rp ON rp.match_id=m.id AND rp.user_id=u.id
     WHERE m.is_visible=TRUE
     ORDER BY m.match_date ASC, u.display_name ASC
   `);
