@@ -315,8 +315,8 @@ console.log("match", match.match_id, "user", selectedUser, "pred", pred);
 
              {match.home_score !== null && (
   <div className="flex justify-center gap-8 mb-1">
-    <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Resultado</span>
-    <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Apuesta</span>
+<span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Apuesta</span>
+<span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Resultado</span>
   </div>
 )}
 
@@ -325,10 +325,17 @@ console.log("match", match.match_id, "user", selectedUser, "pred", pred);
   <div className="text-center min-w-[120px]">
     {match.home_score !== null ? (
       <div className="flex items-center justify-center gap-4">
-        <span className="text-sm font-bold text-primary">{match.home_score} - {match.away_score}</span>
-        {pred?.home_score_pred !== null && pred?.home_score_pred !== undefined ? (
-          <span className={`text-sm font-bold ${
-            (pred as any).points === 3 ? "text-green-600" :
+       {pred?.home_score_pred !== null && pred?.home_score_pred !== undefined ? (
+  <span className={`text-sm font-bold ${
+    (pred as any).points === 3 ? "text-green-600" :
+    (pred as any).points === 2 ? "text-blue-600" :
+    (pred as any).points === 1 ? "text-yellow-600" :
+    (pred as any).points === 0 ? "text-red-500" : "text-gray-400"
+  }`}>{pred.home_score_pred} - {pred.away_score_pred}</span>
+) : (
+  <span className="text-sm text-gray-300">—</span>
+)}
+<span className="text-sm font-bold text-primary">{match.home_score} - {match.away_score}</span>            (pred as any).points === 3 ? "text-green-600" :
             (pred as any).points === 2 ? "text-blue-600" :
             (pred as any).points === 1 ? "text-yellow-600" :
             (pred as any).points === 0 ? "text-red-500" : "text-gray-400"
