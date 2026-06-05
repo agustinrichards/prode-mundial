@@ -24,7 +24,7 @@ export default async function LeaderboardPage() {
 
   const snapshots = await query(`
     SELECT DISTINCT snapshot_date FROM leaderboard_snapshots
-    ORDER BY snapshot_date DESC
+    ORDER BY snapshot_date ASC
   `);
 
   const serializedRows = rows.map((r: any) => ({

@@ -72,9 +72,7 @@ export function LeaderboardClient({ rows: initialRows, currentUserId, snapshots 
             className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
               selectedDate === "current" ? "bg-primary text-white" : "bg-white border border-gray-200 text-gray-600 hover:border-primary/40"
             }`}>
-            Hoy
-          </button>
-          {snapshots.map(s => (
+            {snapshots.map(s => (
             <button key={s.snapshot_date} onClick={() => loadSnapshot(s.snapshot_date)}
               className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
                 selectedDate === s.snapshot_date ? "bg-primary text-white" : "bg-white border border-gray-200 text-gray-600 hover:border-primary/40"
@@ -82,9 +80,14 @@ export function LeaderboardClient({ rows: initialRows, currentUserId, snapshots 
               {format(parseISO(s.snapshot_date), "d MMM", { locale: es })}
             </button>
           ))}
+          <button onClick={() => loadSnapshot("current")}
+            className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+              selectedDate === "current" ? "bg-primary text-white" : "bg-white border border-gray-200 text-gray-600 hover:border-primary/40"
+            }`}>
+            Hoy
+          </button>
         </div>
       )}
-
       <div className={`bg-white rounded-2xl border border-gray-200 overflow-hidden transition-opacity ${loading ? "opacity-50" : ""}`}>
         <table className="w-full text-sm">
           <thead>
