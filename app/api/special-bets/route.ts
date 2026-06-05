@@ -1,19 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth/options";
-import { query } from "@/lib/db";
+import { query, queryOne } from "@/lib/db";
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
   const userId = (session.user as any).id;
   const body = await req.json();
 
-  const firstMatch = await query(
-    "SELECT predictions_close_at FROM matches WHERE date_label='fecha_1' ORDER BY predictions_close_at ASC LIMIT 1"
+  // Verificar que el período fecha_1 esté abierto
+  const period = await queryOne(
+    "SELECT is_open FROM betting_periods WHERE date_label = 'fecha_1'"
   );
-  if (firstMatch[0] && new Date(firstMatch[0].predictions_close_at) < new Date()) {
+  if (!period?.is_open) {
     return NextResponse.json({ error: "Plazo cerrado" }, { status: 403 });
   }
 
@@ -30,6 +30,5 @@ export async function POST(req: NextRequest) {
        updated_at = NOW()`,
     [userId, championTeam ?? null, topScorerName ?? null, lagoDay ?? null, waterInstallations ?? null]
   );
-
   return NextResponse.json({ ok: true });
 }
