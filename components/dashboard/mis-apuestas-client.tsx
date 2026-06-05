@@ -116,13 +116,12 @@ export function MisApuestasClient({ myPredictions, allPredictions, specialBets, 
   const specialByUser: Record<string, SpecialBet> = {};
   for (const b of specialBets) specialByUser[b.user_id] = b;
 
-  const getPredForUser = (matchId: string, uid: string) => {
-    const match = myByMatch[matchId];
-    if (!match) return null;
-    if (uid === userId) return match;
-    if (!isClosed(match.predictions_close_at)) return null;
-    return allByMatchUser[matchId]?.[uid] ?? null;
-  };
+const getPredForUser = (matchId: string, uid: string) => {
+  const match = myByMatch[matchId];
+  if (!match) return null;
+  if (uid === userId) return match;
+  return allByMatchUser[matchId]?.[uid] ?? null;
+};
 
   const getDateGroupPoints = (uid: string, dateLabels: string[]) => {
     const preds = myPredictions.filter(m => dateLabels.includes(m.date_label));
