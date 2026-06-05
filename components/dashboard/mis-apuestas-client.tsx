@@ -324,8 +324,8 @@ export function MisApuestasClient({ myPredictions, allPredictions, specialBets, 
 
                 {match.home_score !== null && (
 <div className="flex justify-center gap-4 mb-1">
-<span className="text-xs font-semibold text-gray-400 uppercase tracking-wider w-16 text-center">Resultado</span>
 <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider w-16 text-center">Apuesta</span>
+<span className="text-xs font-semibold text-gray-400 uppercase tracking-wider w-16 text-center">Resultado</span>
 </div>
                 )}
 
