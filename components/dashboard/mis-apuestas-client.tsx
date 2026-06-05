@@ -292,6 +292,7 @@ export function MisApuestasClient({ myPredictions, allPredictions, specialBets, 
             const pred = getPredForUser(match.match_id, selectedUser);
             const isMe = selectedUser === userId;
             const pts = (pred as any)?.points ?? null;
+console.log("match", match.match_id, "user", selectedUser, "pred", pred);
 
             return (
               <div key={match.match_id} className="bg-white rounded-xl border border-gray-200 p-4">
