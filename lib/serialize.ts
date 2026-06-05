@@ -4,14 +4,11 @@ export function serializeDate(val: any): string {
   return String(val);
 }
 
-export function serializeDates<T extends Record<string, any>>(
-  rows: T[],
-  fields: string[]
-): T[] {
+export function serializeDates(rows: any[], fields: string[]): any[] {
   return rows.map(row => {
     const out = { ...row };
     for (const f of fields) {
-      if (f in out) out[f] = serializeDate(out[f]);
+      if (f in out) (out as any)[f] = serializeDate(out[f]);
     }
     return out;
   });
