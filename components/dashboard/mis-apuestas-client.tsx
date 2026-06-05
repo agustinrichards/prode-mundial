@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { format, isBefore } from "date-fns";
+import { format, isBefore, parseISO, isValid } from "date-fns";
 import { es } from "date-fns/locale";
 import { Lock } from "lucide-react";
 
@@ -70,17 +70,9 @@ const DATE_GROUPS = [
   { key: "semifinal", label: "Semis", dateLabels: ["sf_1"] },
   { key: "third_place", label: "3° Puesto", dateLabels: ["3rd_place"] },
   { key: "final", label: "Final", dateLabels: ["final"] },
-  { key: "especiales", label: "⭐ Especiales", dateLabels: [] },
-  { key: "totales", label: "📊 Totales", dateLabels: [] },
+  { key: "especiales", label: "Especiales", dateLabels: [] },
+  { key: "totales", label: "Totales", dateLabels: [] },
 ];
-
-const ptColor = (pts: number | null) => {
-  if (pts === null || pts === undefined) return "text-gray-300";
-  if (pts === 0) return "text-red-500";
-  if (pts === 1) return "text-yellow-600";
-  if (pts === 2) return "text-blue-600";
-  return "text-green-600";
-};
 
 const ptBadge = (pts: number | null) => {
   if (pts === null || pts === undefined) return "bg-gray-100 text-gray-400";
@@ -90,14 +82,28 @@ const ptBadge = (pts: number | null) => {
   return "bg-red-100 text-red-700";
 };
 
+function safeParseDate(val: string | null | undefined): Date | null {
+  if (!val) return null;
+  const d = parseISO(val);
+  return isValid(d) ? d : null;
+}
+
+function formatMatchDate(val: string | null | undefined): string {
+  const d = safeParseDate(val);
+  if (!d) return "—";
+  return format(d, "EEE d MMM · HH:mm", { locale: es });
+}
+
 export function MisApuestasClient({ myPredictions, allPredictions, specialBets, users, userId }: Props) {
   const [selectedUser, setSelectedUser] = useState<string>(userId);
   const [activeTab, setActiveTab] = useState("fecha_1");
 
   const now = new Date();
-  const isClosed = (closeAt: string) => isBefore(new Date(closeAt), now);
+  const isClosed = (closeAt: string | null | undefined) => {
+    const d = safeParseDate(closeAt);
+    return d ? isBefore(d, now) : false;
+  };
 
-  // Predictions by match and user
   const allByMatchUser: Record<string, Record<string, OtherPred>> = {};
   for (const p of allPredictions) {
     if (!allByMatchUser[p.match_id]) allByMatchUser[p.match_id] = {};
@@ -118,7 +124,6 @@ export function MisApuestasClient({ myPredictions, allPredictions, specialBets, 
     return allByMatchUser[matchId]?.[uid] ?? null;
   };
 
-  // Points per user per date group
   const getDateGroupPoints = (uid: string, dateLabels: string[]) => {
     const preds = myPredictions.filter(m => dateLabels.includes(m.date_label));
     let total = 0;
@@ -155,7 +160,6 @@ export function MisApuestasClient({ myPredictions, allPredictions, specialBets, 
 
   return (
     <div className="space-y-4">
-      {/* Users header */}
       <div className="bg-white rounded-xl border border-gray-200 p-4">
         <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Jugadores</p>
         <div className="flex flex-wrap gap-2">
@@ -171,7 +175,6 @@ export function MisApuestasClient({ myPredictions, allPredictions, specialBets, 
         </div>
       </div>
 
-      {/* Tabs */}
       <div className="flex gap-1.5 overflow-x-auto pb-1">
         {visibleTabs.map(tab => (
           <button key={tab.key} onClick={() => setActiveTab(tab.key)}
@@ -183,7 +186,6 @@ export function MisApuestasClient({ myPredictions, allPredictions, specialBets, 
         ))}
       </div>
 
-      {/* TOTALES tab */}
       {activeTab === "totales" && (
         <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
           <table className="w-full text-sm">
@@ -218,17 +220,16 @@ export function MisApuestasClient({ myPredictions, allPredictions, specialBets, 
         </div>
       )}
 
-      {/* ESPECIALES tab */}
       {activeTab === "especiales" && (
         <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
           <table className="w-full text-sm">
             <thead>
               <tr className="bg-gray-50 border-b">
                 <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500">Jugador</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500">Campeón</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500">Campeon</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500">Goleador</th>
                 <th className="text-left px-3 py-3 text-xs font-semibold text-gray-500 hidden md:table-cell">LAGO</th>
-                <th className="text-right px-3 py-3 text-xs font-semibold text-gray-500 hidden md:table-cell">💧</th>
+                <th className="text-right px-3 py-3 text-xs font-semibold text-gray-500 hidden md:table-cell">Agua</th>
               </tr>
             </thead>
             <tbody>
@@ -240,25 +241,27 @@ export function MisApuestasClient({ myPredictions, allPredictions, specialBets, 
                   <tr key={u.id} className={`border-t border-gray-50 ${isMe ? "bg-primary/5" : ""}`}>
                     <td className="px-4 py-3 font-medium">{u.display_name}{isMe && <span className="text-xs text-primary ml-1">(vos)</span>}</td>
                     <td className="px-4 py-3">
-                      <span className="text-gray-700">{b?.champion_team ?? <span className="text-gray-300">—</span>}</span>
+                      <span className="text-gray-700">{b?.champion_team ?? <span className="text-gray-300">-</span>}</span>
                       {(b?.champion_points ?? 0) > 0 && <span className="ml-1.5 text-xs font-bold text-green-600">+{b.champion_points}</span>}
                     </td>
                     <td className="px-4 py-3">
-                      <span className="text-gray-700">{b?.top_scorer_name ?? <span className="text-gray-300">—</span>}</span>
+                      <span className="text-gray-700">{b?.top_scorer_name ?? <span className="text-gray-300">-</span>}</span>
                       {(b?.scorer_points ?? 0) > 0 && <span className="ml-1.5 text-xs font-bold text-green-600">+{b.scorer_points}</span>}
                     </td>
                     <td className="px-3 py-3 hidden md:table-cell">
-                      <span className="text-gray-700">{b?.lago_day ? (() => { const [y,m,d] = b.lago_day.split("-").map(Number); return new Date(y,m-1,d).toLocaleDateString("es-AR",{day:"numeric",month:"short"}); })() : <span className="text-gray-300">—</span>}</span>
+                      {b?.lago_day ? (() => {
+                        const d = safeParseDate(b.lago_day);
+                        return d ? <span className="text-gray-700">{format(d, "d MMM", { locale: es })}</span> : <span className="text-gray-300">-</span>;
+                      })() : <span className="text-gray-300">-</span>}
                       {(b?.lago_bonus ?? 0) > 0 && <span className="ml-1.5 text-xs font-bold text-green-600">+{b.lago_bonus}</span>}
                     </td>
                     <td className="px-3 py-3 text-right hidden md:table-cell">
-                      <span className="text-gray-700">{b?.water_installations?.toLocaleString() ?? <span className="text-gray-300">—</span>}</span>
+                      <span className="text-gray-700">{b?.water_installations?.toLocaleString() ?? <span className="text-gray-300">-</span>}</span>
                       {(b?.water_points ?? 0) > 0 && <span className="ml-1.5 text-xs font-bold text-green-600">+{b.water_points}</span>}
                     </td>
                   </tr>
                 );
               })}
-              {/* Totals row */}
               <tr className="border-t-2 border-gray-200 bg-gray-50">
                 <td className="px-4 py-2 text-xs font-semibold text-gray-500">TOTAL ESPECIALES</td>
                 <td className="px-4 py-2 text-right text-xs font-bold text-gray-700" colSpan={4}>
@@ -270,10 +273,8 @@ export function MisApuestasClient({ myPredictions, allPredictions, specialBets, 
         </div>
       )}
 
-      {/* Match predictions view */}
       {activeTab !== "totales" && activeTab !== "especiales" && (
         <div className="space-y-2">
-          {/* Date subtotal */}
           {activeGroup.dateLabels.length > 0 && (
             <div className="flex justify-end">
               <span className="text-xs text-gray-500">
@@ -283,7 +284,7 @@ export function MisApuestasClient({ myPredictions, allPredictions, specialBets, 
           )}
 
           {tabMatches.length === 0 && (
-            <p className="text-center text-gray-400 py-8 text-sm">No hay partidos en esta etapa todavía.</p>
+            <p className="text-center text-gray-400 py-8 text-sm">No hay partidos en esta etapa todavia.</p>
           )}
 
           {tabMatches.map(match => {
@@ -297,7 +298,7 @@ export function MisApuestasClient({ myPredictions, allPredictions, specialBets, 
                 <div className="flex items-start justify-between mb-2">
                   <div>
                     <span className="text-xs text-gray-400">
-                      {format(new Date(String(match.match_date)), "EEE d MMM · HH:mm", { locale: es })}
+                      {formatMatchDate(match.match_date)}
                       {match.group_name && <span className="ml-1.5">· Grupo {match.group_name}</span>}
                     </span>
                     {(match.venue || match.city) && (
