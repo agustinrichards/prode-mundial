@@ -7,22 +7,26 @@ export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!(session?.user as any)?.isAdmin) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
-  const { userId, matchId, unlockAll, dateLabel } = await req.json();
+  const { userId, matchId, unlockAll, dateLabel, unlockResult } = await req.json();
+
+  if (unlockResult && matchId) {
+    await query("UPDATE matches SET home_score=NULL, away_score=NULL, updated_at=NOW() WHERE id=$1", [matchId]);
+    await query("UPDATE predictions SET points=NULL WHERE match_id=$1", [matchId]);
+    await query("UPDATE rio_predictions SET points=NULL WHERE match_id=$1", [matchId]);
+    return NextResponse.json({ ok: true });
+  }
 
   if (unlockAll && userId) {
-    // Unlock all predictions for a user
     await query("UPDATE predictions SET locked=FALSE WHERE user_id=$1", [userId]);
     return NextResponse.json({ ok: true });
   }
 
   if (matchId && userId) {
-    // Unlock specific prediction
     await query("UPDATE predictions SET locked=FALSE WHERE user_id=$1 AND match_id=$2", [userId, matchId]);
     return NextResponse.json({ ok: true });
   }
 
   if (dateLabel && userId) {
-    // Unlock all predictions for a date label
     await query(`
       UPDATE predictions SET locked=FALSE
       WHERE user_id=$1 AND match_id IN (
