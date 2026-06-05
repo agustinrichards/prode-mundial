@@ -37,6 +37,8 @@ interface OtherPred {
   points: number | null;
   co2: boolean;
   rio: boolean;
+  rio_home: number | null;
+  rio_away: number | null;
 }
 
 interface SpecialBet {
@@ -82,6 +84,14 @@ const ptBadge = (pts: number | null) => {
   return "bg-red-100 text-red-700";
 };
 
+const ptColor = (pts: number | null) => {
+  if (pts === null || pts === undefined) return "text-gray-400";
+  if (pts === 3) return "text-green-600";
+  if (pts === 2) return "text-blue-600";
+  if (pts === 1) return "text-yellow-600";
+  return "text-red-500";
+};
+
 function safeParseDate(val: string | null | undefined): Date | null {
   if (!val) return null;
   const d = parseISO(val);
@@ -116,12 +126,12 @@ export function MisApuestasClient({ myPredictions, allPredictions, specialBets, 
   const specialByUser: Record<string, SpecialBet> = {};
   for (const b of specialBets) specialByUser[b.user_id] = b;
 
-const getPredForUser = (matchId: string, uid: string) => {
-  const match = myByMatch[matchId];
-  if (!match) return null;
-  if (uid === userId) return match;
-  return allByMatchUser[matchId]?.[uid] ?? null;
-};
+  const getPredForUser = (matchId: string, uid: string) => {
+    const match = myByMatch[matchId];
+    if (!match) return null;
+    if (uid === userId) return match;
+    return allByMatchUser[matchId]?.[uid] ?? null;
+  };
 
   const getDateGroupPoints = (uid: string, dateLabels: string[]) => {
     const preds = myPredictions.filter(m => dateLabels.includes(m.date_label));
@@ -291,7 +301,6 @@ const getPredForUser = (matchId: string, uid: string) => {
             const pred = getPredForUser(match.match_id, selectedUser);
             const isMe = selectedUser === userId;
             const pts = (pred as any)?.points ?? null;
-console.log("match", match.match_id, "user", selectedUser, "pred", pred);
 
             return (
               <div key={match.match_id} className="bg-white rounded-xl border border-gray-200 p-4">
@@ -313,60 +322,52 @@ console.log("match", match.match_id, "user", selectedUser, "pred", pred);
                   </div>
                 </div>
 
-             {match.home_score !== null && (
-  <div className="flex justify-center gap-8 mb-1">
-<span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Apuesta</span>
-<span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Resultado</span>
-  </div>
-)}
+                {match.home_score !== null && (
+                  <div className="flex justify-center gap-12 mb-1">
+                    <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Apuesta</span>
+                    <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Resultado</span>
+                  </div>
+                )}
 
-<div className="flex items-center gap-3">
-  <span className="flex-1 text-right font-semibold text-sm">{match.home_team}</span>
-  <div className="text-center min-w-[120px]">
-    {match.home_score !== null ? (
-      <div className="flex items-center justify-center gap-4">
-       {pred?.home_score_pred !== null && pred?.home_score_pred !== undefined ? (
-  <span className={`text-sm font-bold ${
-    (pred as any).points === 3 ? "text-green-600" :
-    (pred as any).points === 2 ? "text-blue-600" :
-    (pred as any).points === 1 ? "text-yellow-600" :
-    (pred as any).points === 0 ? "text-red-500" : "text-gray-400"
-  }`}>{pred.home_score_pred} - {pred.away_score_pred}</span>
-) : (
-  <span className="text-sm text-gray-300">—</span>
-)}
-<span className="text-sm font-bold text-primary">{match.home_score} - {match.away_score}</span>            (pred as any).points === 3 ? "text-green-600" :
-            (pred as any).points === 2 ? "text-blue-600" :
-            (pred as any).points === 1 ? "text-yellow-600" :
-            (pred as any).points === 0 ? "text-red-500" : "text-gray-400"
-          }`}>{pred.home_score_pred} - {pred.away_score_pred}</span>
-        ) : (
-          <span className="text-sm text-gray-300">—</span>
-        )}
-      </div>
-    ) : pred?.home_score_pred !== null && pred?.home_score_pred !== undefined ? (
-      <span className={`text-sm font-bold px-3 py-1 rounded-lg ${isMe ? "bg-primary/10 text-primary" : "bg-gray-100 text-gray-700"}`}>
-        {pred.home_score_pred} - {pred.away_score_pred}
-      </span>
-    ) : (
-      <span className="text-xs text-gray-300">{!isMe && !closed ? "🔒" : "—"}</span>
-    )}
-  </div>
-  <span className="flex-1 font-semibold text-sm">{match.away_team}</span>
-</div>
+                <div className="flex items-center gap-3">
+                  <span className="flex-1 text-right font-semibold text-sm">{match.home_team}</span>
+                  <div className="text-center min-w-[140px]">
+                    {match.home_score !== null ? (
+                      <div className="flex items-center justify-center gap-4">
+                        {pred?.home_score_pred !== null && pred?.home_score_pred !== undefined ? (
+                          <span className={`text-sm font-bold ${ptColor(pts)}`}>
+                            {pred.home_score_pred} - {pred.away_score_pred}
+                          </span>
+                        ) : (
+                          <span className="text-sm text-gray-300">—</span>
+                        )}
+                        <span className="text-sm font-bold text-primary">{match.home_score} - {match.away_score}</span>
+                      </div>
+                    ) : pred?.home_score_pred !== null && pred?.home_score_pred !== undefined ? (
+                      <span className={`text-sm font-bold px-3 py-1 rounded-lg ${isMe ? "bg-primary/10 text-primary" : "bg-gray-100 text-gray-700"}`}>
+                        {pred.home_score_pred} - {pred.away_score_pred}
+                      </span>
+                    ) : (
+                      <span className="text-xs text-gray-300">{!isMe && !closed ? "🔒" : "—"}</span>
+                    )}
+                  </div>
+                  <span className="flex-1 font-semibold text-sm">{match.away_team}</span>
+                </div>
 
-{pred && ((pred as any).co2 || (pred as any).rio) && (
-  <div className="flex gap-2 mt-2 justify-center flex-wrap">
-    {(pred as any).co2 && <span className="text-xs bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full">CO2 x2</span>}
-    {(pred as any).rio && (
-      <span className="text-xs bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full">
-        RIO{(pred as any).rio_home !== null && (pred as any).rio_away !== null
-          ? ` · ${(pred as any).rio_home}-${(pred as any).rio_away}`
-          : ""}
-      </span>
-    )}
-  </div>
-)}
+                {pred && ((pred as any).co2 || (pred as any).rio) && (
+                  <div className="flex gap-2 mt-2 justify-center flex-wrap">
+                    {(pred as any).co2 && (
+                      <span className="text-xs bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full">CO2 x2</span>
+                    )}
+                    {(pred as any).rio && (
+                      <span className="text-xs bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full">
+                        RIO{(pred as any).rio_home !== null && (pred as any).rio_away !== null
+                          ? ` · ${(pred as any).rio_home}-${(pred as any).rio_away}`
+                          : ""}
+                      </span>
+                    )}
+                  </div>
+                )}
               </div>
             );
           })}
