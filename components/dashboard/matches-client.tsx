@@ -210,6 +210,14 @@ export function MatchesClient({ matches, userId, co2Usage, rioUsage }: Props) {
     return "bg-red-100 text-red-700";
   };
 
+  const predColor = (pts: number | null) => {
+    if (pts === 3) return "text-green-600";
+    if (pts === 2) return "text-blue-600";
+    if (pts === 1) return "text-yellow-600";
+    if (pts === 0) return "text-red-500";
+    return "text-gray-700";
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex gap-1.5 overflow-x-auto pb-1">
@@ -324,7 +332,16 @@ export function MatchesClient({ matches, userId, co2Usage, rioUsage }: Props) {
                     <span className="flex-1 text-right font-semibold text-sm text-gray-900">{match.home_team}</span>
                     <div className="flex items-center gap-1">
                       {match.home_score !== null ? (
-                        <span className="text-lg font-bold text-primary px-2">{match.home_score} - {match.away_score}</span>
+                        <div className="flex flex-col items-center px-2">
+                          {match.home_score_pred !== null ? (
+                            <span className={`text-lg font-bold ${predColor(match.points)}`}>
+                              {match.home_score_pred} - {match.away_score_pred}
+                            </span>
+                          ) : (
+                            <span className="text-lg font-bold text-gray-300">—</span>
+                          )}
+                          <span className="text-xs text-gray-400">{match.home_score} - {match.away_score}</span>
+                        </div>
                       ) : (
                         <>
                           <input type="number" min="0" max="99"
