@@ -1,10 +1,12 @@
 import { requireAdmin } from "@/lib/auth/session";
 import { query, queryOne } from "@/lib/db";
 import { AdminWaterClient } from "@/components/admin/admin-water-client";
+import { serializeDates } from "@/lib/serialize";
 
 export default async function AdminWaterPage() {
   await requireAdmin();
-  const updates = await query("SELECT * FROM water_updates ORDER BY week_number ASC");
+  const updatesRaw = await query("SELECT * FROM water_updates ORDER BY week_number ASC");
+  const updates = serializeDates(updatesRaw, ["week_date", "created_at", "updated_at"]);
   const result = await queryOne("SELECT water_real FROM special_results LIMIT 1");
   const bets = await query(`
     SELECT sb.water_installations, u.display_name
