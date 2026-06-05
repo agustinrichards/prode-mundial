@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 import { es } from "date-fns/locale";
 
 interface Match {
@@ -68,7 +68,7 @@ export function AdminResultsClient({ matches }: { matches: Match[] }) {
               <div className="flex items-center justify-between mb-3">
                 <span className="font-semibold text-gray-900">{match.home_team} vs {match.away_team}</span>
                 <span className="text-xs text-gray-400">
-                  {format(new Date(match.match_date), "d MMM · HH:mm", { locale: es })}
+                  {format(parseISO(match.match_date), "d MMM · HH:mm", { locale: es })}
                 </span>
               </div>
               <div className="flex items-center gap-3">

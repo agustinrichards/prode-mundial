@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
+import { parseISO } from "date-fns";
 
 interface Match {
   id: string;
@@ -34,14 +35,14 @@ export function AdminMatchesClient({ matches: initial }: { matches: Match[] }) {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Gestión de Partidos</h1>
+      <h1 className="text-2xl font-bold">Gestion de Partidos</h1>
       <div className="space-y-2">
         {matches.map(m => (
           <div key={m.id} className="bg-white rounded-xl border px-4 py-3 flex items-center justify-between">
             <div>
               <span className="font-medium">{m.home_team} vs {m.away_team}</span>
               <span className="text-xs text-gray-400 ml-3">
-                {new Date(m.match_date).toLocaleDateString("es-AR")} · Grupo {m.group_name}
+                {parseISO(m.match_date).toLocaleDateString("es-AR")} · Grupo {m.group_name}
               </span>
             </div>
             <button

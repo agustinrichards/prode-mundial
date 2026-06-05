@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 import { es } from "date-fns/locale";
 
 interface Row {
@@ -79,7 +79,7 @@ export function LeaderboardClient({ rows: initialRows, currentUserId, snapshots 
               className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
                 selectedDate === s.snapshot_date ? "bg-primary text-white" : "bg-white border border-gray-200 text-gray-600 hover:border-primary/40"
               }`}>
-              {format(new Date(s.snapshot_date + "T12:00:00"), "d MMM", { locale: es })}
+              {format(parseISO(s.snapshot_date), "d MMM", { locale: es })}
             </button>
           ))}
         </div>

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
+import { parseISO } from "date-fns";
 
 const TEAMS = ["Argentina","Brasil","Francia","España","Alemania","Portugal","Países Bajos","Inglaterra","Bélgica","Uruguay","México","Canadá","Estados Unidos","Marruecos","Senegal","Japón","Corea del Sur","Croacia","Colombia","Ecuador","Suiza","Austria","Türkiye","Noruega","Suecia","Australia","Costa de Marfil","Sudáfrica","Ghana","Qatar","Bosnia y Herzegovina","Haití","Escocia","Paraguay","Curazao","Túnez","Egipto","Irán","Cabo Verde","Arabia Saudita","Iraq","Argelia","Jordania","RD Congo","Uzbekistán","Panamá","Nueva Zelanda"].sort();
 
@@ -32,7 +33,7 @@ export function AdminKnockoutClient({ matches }: { matches: Match[] }) {
 
   const saveMatch = async (matchId: string) => {
     const t = teams[matchId];
-    if (!t.home || !t.away) { toast({ title: "Elegí ambos equipos", variant: "destructive" }); return; }
+    if (!t.home || !t.away) { toast({ title: "Elegi ambos equipos", variant: "destructive" }); return; }
     setSaving(matchId);
     try {
       const res = await fetch("/api/admin/knockout", {
@@ -41,7 +42,7 @@ export function AdminKnockoutClient({ matches }: { matches: Match[] }) {
         body: JSON.stringify({ matchId, homeTeam: t.home, awayTeam: t.away }),
       });
       if (!res.ok) throw new Error((await res.json()).error);
-      toast({ title: "✓ Equipos actualizados" });
+      toast({ title: "Equipos actualizados" });
     } catch (e: any) {
       toast({ title: "Error", description: e.message, variant: "destructive" });
     } finally {
@@ -49,7 +50,6 @@ export function AdminKnockoutClient({ matches }: { matches: Match[] }) {
     }
   };
 
-  // Group by stage
   const grouped: Record<string, Match[]> = {};
   for (const m of matches) {
     if (!grouped[m.stage]) grouped[m.stage] = [];
@@ -73,7 +73,7 @@ export function AdminKnockoutClient({ matches }: { matches: Match[] }) {
               return (
                 <div key={m.id} className="bg-white rounded-xl border p-4">
                   <p className="text-xs text-gray-400 mb-3">
-                    {new Date(m.match_date).toLocaleDateString("es-AR", { weekday: "short", day: "numeric", month: "short" })}
+                    {parseISO(m.match_date).toLocaleDateString("es-AR", { weekday: "short", day: "numeric", month: "short" })}
                   </p>
                   <div className="flex items-center gap-3">
                     <div className="flex-1">
