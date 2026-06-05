@@ -232,6 +232,10 @@ const isClosed = (m: Match) => {
         ))}
       </div>
 
+<div className="bg-blue-50 border border-blue-100 rounded-xl px-4 py-3 text-xs text-blue-700">
+  <span className="font-semibold">Puntos:</span> Exacto <strong>3pts</strong> · Simple (ganador/empate) <strong>1pt</strong> · CO2 duplica puntos · RIO agrega segunda predicción (se toma la mejor)
+</div>
+
       <div className="bg-white rounded-xl border border-gray-100 px-4 py-3">
         <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Comodines disponibles</p>
         <div className="flex flex-wrap gap-4">
