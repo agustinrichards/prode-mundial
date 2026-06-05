@@ -334,16 +334,23 @@ const isClosed = (m: Match) => {
                     <span className="flex-1 text-right font-semibold text-sm text-gray-900">{match.home_team}</span>
                     <div className="flex items-center gap-1">
                       {match.home_score !== null ? (
-                        <div className="flex flex-col items-center px-2">
-                          {match.home_score_pred !== null ? (
-                            <span className={`text-lg font-bold ${predColor(match.points)}`}>
-                              {match.home_score_pred} - {match.away_score_pred}
-                            </span>
-                          ) : (
-                            <span className="text-lg font-bold text-gray-300">—</span>
-                          )}
-                          <span className="text-xs text-gray-400">{match.home_score} - {match.away_score}</span>
-                        </div>
+  <div className="flex flex-col items-center px-2">
+    {match.home_score_pred !== null ? (
+      <div className="flex items-center gap-2">
+        <span className={`text-lg font-bold ${predColor(match.points)}`}>
+          {match.home_score_pred} - {match.away_score_pred}
+        </span>
+        {match.rio_used && match.rio_home_pred !== null && (
+          <span className="text-sm text-blue-500 font-medium">
+            ({match.rio_home_pred}-{match.rio_away_pred})
+          </span>
+        )}
+      </div>
+    ) : (
+      <span className="text-lg font-bold text-gray-300">—</span>
+    )}
+    <span className="text-xs text-gray-400">{match.home_score} - {match.away_score}</span>
+  </div>
                       ) : (
                         <>
                           <input type="number" min="0" max="99"

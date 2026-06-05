@@ -26,10 +26,25 @@ export async function POST(req: NextRequest) {
     };
     const labels = stageMap[dateLabel] ?? [dateLabel];
     const ph = labels.map((_, i) => `$${i + 2}`).join(",");
+
+    // Reset predictions
     await query(
       `DELETE FROM predictions WHERE user_id=$1 AND match_id IN (SELECT id FROM matches WHERE date_label IN (${ph}))`,
       [userId, ...labels]
     );
+
+    // Reset RIO predictions
+    await query(
+      `DELETE FROM rio_predictions WHERE user_id=$1 AND match_id IN (SELECT id FROM matches WHERE date_label IN (${ph}))`,
+      [userId, ...labels]
+    );
+
+    // Reset comodin usage
+    await query(
+      `DELETE FROM comodin_usage WHERE user_id=$1 AND match_id IN (SELECT id FROM matches WHERE date_label IN (${ph}))`,
+      [userId, ...labels]
+    );
+
     return NextResponse.json({ ok: true });
   }
 
