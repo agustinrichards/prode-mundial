@@ -27,7 +27,7 @@ export default async function EspecialesPage() {
   const closed = period ? !period.is_open : true;
 
   // Todos los días del mundial con partidos (no solo grupos)
-  const allMatchDays = await query("SELECT DISTINCT match_date::date AS d FROM matches WHERE is_visible=TRUE ORDER BY d ASC");
+  const allMatchDays = await query("SELECT DISTINCT match_date::date AS d FROM matches ORDER BY d ASC");
   const groupMatchDays = allMatchDays
     .map((m: any) => toDateString(m.d))
     .filter((d: string) => Boolean(d) && d.length === 10 && !isNaN(new Date(d + "T12:00:00").getTime()));
