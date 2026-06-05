@@ -11,7 +11,10 @@ interface Row {
   total_points: number;
   special_points: number;
   matches_predicted: number;
-  correct_results: number;
+  exact_results: number;
+  diff_results: number;
+  simple_results: number;
+  co2_points: number;
 }
 
 interface Snapshot {
@@ -83,16 +86,19 @@ export function LeaderboardClient({ rows: initialRows, currentUserId, snapshots 
           </button>
         </div>
       )}
+
       <div className={`bg-white rounded-2xl border border-gray-200 overflow-hidden transition-opacity ${loading ? "opacity-50" : ""}`}>
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-gray-100 bg-gray-50">
               <th className="text-left px-4 py-3 font-semibold text-gray-600 w-10">#</th>
               <th className="text-left px-4 py-3 font-semibold text-gray-600">Jugador</th>
-              <th className="text-right px-4 py-3 font-semibold text-gray-600">Pts</th>
-              <th className="text-right px-4 py-3 font-semibold text-gray-600 hidden sm:table-cell">Especiales</th>
-              <th className="text-right px-4 py-3 font-semibold text-gray-600 hidden md:table-cell">Predicciones</th>
-              <th className="text-right px-4 py-3 font-semibold text-gray-600 hidden md:table-cell">Aciertos</th>
+              <th className="text-right px-3 py-3 font-semibold text-gray-600">Pts</th>
+              <th className="text-right px-3 py-3 font-semibold text-gray-600 hidden lg:table-cell">Exactos</th>
+              <th className="text-right px-3 py-3 font-semibold text-gray-600 hidden lg:table-cell">Dif Gol</th>
+              <th className="text-right px-3 py-3 font-semibold text-gray-600 hidden lg:table-cell">Simples</th>
+              <th className="text-right px-3 py-3 font-semibold text-gray-600 hidden md:table-cell">CO2</th>
+              <th className="text-right px-3 py-3 font-semibold text-gray-600 hidden md:table-cell">Especiales</th>
             </tr>
           </thead>
           <tbody>
@@ -111,15 +117,21 @@ export function LeaderboardClient({ rows: initialRows, currentUserId, snapshots 
                       {isMe && <span className="ml-2 text-xs text-primary/60">(vos)</span>}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-right font-bold text-gray-900">{row.total_points}</td>
-                  <td className="px-4 py-3 text-right text-gray-500 hidden sm:table-cell">+{row.special_points}</td>
-                  <td className="px-4 py-3 text-right text-gray-500 hidden md:table-cell">{row.matches_predicted}</td>
-                  <td className="px-4 py-3 text-right text-gray-500 hidden md:table-cell">{row.correct_results}</td>
+                  <td className="px-3 py-3 text-right font-bold text-gray-900">{row.total_points}</td>
+                  <td className="px-3 py-3 text-right text-green-700 font-medium hidden lg:table-cell">{row.exact_results}</td>
+                  <td className="px-3 py-3 text-right text-blue-700 font-medium hidden lg:table-cell">{row.diff_results}</td>
+                  <td className="px-3 py-3 text-right text-yellow-700 font-medium hidden lg:table-cell">{row.simple_results}</td>
+                  <td className="px-3 py-3 text-right text-orange-600 hidden md:table-cell">
+                    {row.co2_points > 0 ? `+${row.co2_points}` : "—"}
+                  </td>
+                  <td className="px-3 py-3 text-right text-purple-600 hidden md:table-cell">
+                    {row.special_points > 0 ? `+${row.special_points}` : "—"}
+                  </td>
                 </tr>
               );
             })}
             {rows.length === 0 && (
-              <tr><td colSpan={6} className="px-4 py-8 text-center text-gray-400">Aun no hay puntos cargados</td></tr>
+              <tr><td colSpan={8} className="px-4 py-8 text-center text-gray-400">Aun no hay puntos cargados</td></tr>
             )}
           </tbody>
         </table>
