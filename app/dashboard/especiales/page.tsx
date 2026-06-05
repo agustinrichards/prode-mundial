@@ -1,11 +1,11 @@
-import { requireAuth } from "@/lib/auth/session";
+﻿import { requireAuth } from "@/lib/auth/session";
 import { query, queryOne } from "@/lib/db";
 import { SpecialBetsClient } from "@/components/dashboard/special-bets-client";
 import { LagoSelector } from "@/components/dashboard/lago-selector";
 import { WaterBetClient } from "@/components/dashboard/water-bet-client";
 import { redirect } from "next/navigation";
 
-const TEAMS = ["Argentina","Brasil","Francia","España","Alemania","Portugal","Países Bajos","Inglaterra","Bélgica","Uruguay","México","Canadá","Estados Unidos","Marruecos","Senegal","Japón","Corea del Sur","Croacia","Colombia","Ecuador","Suiza","Austria","Türkiye","Noruega","Suecia","Australia","Costa de Marfil","Sudáfrica","Ghana","Qatar","Bosnia y Herzegovina","Haití","Escocia","Paraguay","Curazao","Túnez","Egipto","Irán","Cabo Verde","Arabia Saudita","Iraq","Argelia","Jordania","RD Congo","Uzbekistán","Panamá","Nueva Zelanda"].sort();
+const TEAMS = ["Argentina","Brasil","Francia","EspaÃ±a","Alemania","Portugal","PaÃ­ses Bajos","Inglaterra","BÃ©lgica","Uruguay","MÃ©xico","CanadÃ¡","Estados Unidos","Marruecos","Senegal","JapÃ³n","Corea del Sur","Croacia","Colombia","Ecuador","Suiza","Austria","TÃ¼rkiye","Noruega","Suecia","Australia","Costa de Marfil","SudÃ¡frica","Ghana","Qatar","Bosnia y Herzegovina","HaitÃ­","Escocia","Paraguay","Curazao","TÃºnez","Egipto","IrÃ¡n","Cabo Verde","Arabia Saudita","Iraq","Argelia","Jordania","RD Congo","UzbekistÃ¡n","PanamÃ¡","Nueva Zelanda"].sort();
 
 function toDateString(val: any): string {
   if (!val) return "";
@@ -26,7 +26,7 @@ export default async function EspecialesPage() {
   const period = await queryOne("SELECT is_open FROM betting_periods WHERE date_label='fecha_1'");
   const closed = period ? !period.is_open : true;
 
-  // Todos los días del mundial con partidos (no solo grupos)
+  // Todos los dÃ­as del mundial con partidos (no solo grupos)
   const allMatchDays = await query("SELECT DISTINCT (match_date AT TIME ZONE 'America/Argentina/Buenos_Aires')::date AS d FROM matches ORDER BY d ASC");
   const groupMatchDays = allMatchDays
     .map((m: any) => toDateString(m.d))
