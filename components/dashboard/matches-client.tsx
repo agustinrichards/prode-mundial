@@ -79,7 +79,6 @@ export function MatchesClient({ matches, userId, co2Usage, rioUsage, periods }: 
 
 const isClosed = (m: Match) => {
   const period = periods.find(p => p.date_label === m.date_label);
-  console.log("isClosed", m.date_label, "period:", period, "result:", period ? !period.is_open : true);
   if (period) return !period.is_open;
   return true;
 };
@@ -380,8 +379,19 @@ const isClosed = (m: Match) => {
                     <span className="flex-1 font-semibold text-sm text-gray-900">{match.away_team}</span>
                   </div>
 
-                  {!closed && match.home_score === null && (
-                    <div className="flex justify-center mt-1.5 h-4">
+                  {match.home_score !== null && (match.co2_used || match.rio_used) && (
+  <div className="flex gap-2 mt-2 justify-center">
+    {match.co2_used && <span className="text-xs bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full">CO2 x2</span>}
+    {match.rio_used && match.rio_home_pred !== null && (
+      <span className="text-xs bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full">
+        RIO · {match.rio_home_pred}-{match.rio_away_pred}
+      </span>
+    )}
+  </div>
+)}
+
+{!closed && match.home_score === null && (
+  <div className="flex justify-center mt-1.5 h-4">
                       {isSavingMain ? (
                         <span className="text-xs text-gray-400 flex items-center gap-1"><Loader2 className="w-3 h-3 animate-spin" /> Guardando...</span>
                       ) : locked ? (
@@ -397,14 +407,14 @@ const isClosed = (m: Match) => {
                   {!closed && !locked && match.home_score === null && (
                     <div className="flex gap-2 mt-3 pt-3 border-t border-gray-100">
                       <button onClick={() => toggleComodin(match, "CO2")}
-                        disabled={!match.co2_used && co2Used(match.stage) >= (CO2_LIMITS[match.stage] ?? 0)}
+  disabled={!match.co2_used && (co2Used(match.stage) >= (CO2_LIMITS[match.stage] ?? 0) || match.rio_used)}
                         className={`flex-1 text-xs py-1.5 rounded-lg font-medium border transition-all disabled:opacity-40 ${
                           match.co2_used ? "bg-orange-500 text-white border-orange-500" : "border-orange-200 text-orange-600 hover:bg-orange-50"
                         }`}>
                         {match.co2_used ? "✓ CO2 x2" : "CO2 doblar"}
                       </button>
                       <button onClick={() => toggleComodin(match, "RIO")}
-                        disabled={!match.rio_used && rioUsed(match.stage) >= (RIO_LIMITS[match.stage] ?? 0)}
+  disabled={!match.rio_used && (rioUsed(match.stage) >= (RIO_LIMITS[match.stage] ?? 0) || match.co2_used)}
                         className={`flex-1 text-xs py-1.5 rounded-lg font-medium border transition-all disabled:opacity-40 ${
                           match.rio_used ? "bg-blue-500 text-white border-blue-500" : "border-blue-200 text-blue-600 hover:bg-blue-50"
                         }`}>
