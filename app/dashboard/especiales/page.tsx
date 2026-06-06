@@ -48,6 +48,7 @@ const groupMatchDays = allMatchDays
   `);
 
   const lagoDay = specialBets?.lago_day ? toDateString(specialBets.lago_day) : null;
+const specialBetsSerialized = specialBets ? serializeDates([specialBets], ["lago_day", "created_at", "updated_at"])[0] : null;
 const waterUpdatesSerialized = serializeDates(waterUpdates, ["week_date", "created_at", "updated_at"]);
 const allWaterBetsSerialized = serializeDates(allWaterBets, []);
 
@@ -57,7 +58,7 @@ const allWaterBetsSerialized = serializeDates(allWaterBets, []);
         <h1 className="text-4xl font-display">APUESTAS ESPECIALES</h1>
         <p className="text-muted-foreground mt-1">Se cierran junto con la Fecha 1 de grupos</p>
       </div>
-      <SpecialBetsClient userId={userId} initialBets={specialBets} teams={TEAMS} closed={closed} closeDate={null} />
+      <SpecialBetsClient userId={userId} initialBets={specialBetsSerialized} teams={TEAMS} closed={closed} closeDate={null} />
       <LagoSelector userId={userId} currentLagoDay={lagoDay} groupMatchDays={groupMatchDays} isLocked={closed} />
       <WaterBetClient userId={userId} currentBet={specialBets?.water_installations ?? null} closed={closed} updates={waterUpdatesSerialized} allBets={allWaterBetsSerialized} />
     </div>
