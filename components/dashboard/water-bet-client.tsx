@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Check, Lock } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 import { es } from "date-fns/locale";
 
 interface WaterUpdate {
@@ -75,7 +75,7 @@ export function WaterBetClient({ userId, currentBet, closed, updates, allBets }:
             {updates.map(u => (
               <div key={u.week_number} className="flex items-center justify-between text-xs">
                 <span className="text-blue-600">
-                  Semana {u.week_number} · {format(new Date(u.week_date + "T12:00:00"), "d MMM", { locale: es })}
+                  Semana {u.week_number} · {format(parseISO(u.week_date.substring(0, 10)), "d MMM", { locale: es })}
                 </span>
                 <span className="font-bold text-blue-800">
                   {u.weekly_net > 0 ? "+" : ""}{u.weekly_net.toLocaleString()} · Acum: {u.cumulative.toLocaleString()}
