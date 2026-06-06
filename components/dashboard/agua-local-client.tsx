@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { format, parseISO, isValid } from "date-fns";
 import { es } from "date-fns/locale";
@@ -39,7 +39,7 @@ export function AguaLocalClient({ updates }: Props) {
             {lastUpdate?.weekly_net >= 0 ? "+" : ""}{lastUpdate?.weekly_net ?? 0}
           </p>
           <p className="text-xs text-gray-400 mt-1">
-            Semana {lastUpdate?.week_number} · {formatWeekDate(lastUpdate?.week_date)}
+            Semana {lastUpdate?.week_number} Â· {formatWeekDate(lastUpdate?.week_date)}
           </p>
         </div>
       </div>
@@ -52,7 +52,7 @@ export function AguaLocalClient({ updates }: Props) {
             <XAxis dataKey="week_date" tickFormatter={formatWeekDate} tick={{ fontSize: 11 }} />
             <YAxis tick={{ fontSize: 11 }} />
             <Tooltip
-              formatter={(value: number) => [`${value} instalaciones`, "Semanal"]}
+              formatter={(value: any) => [`${value} instalaciones`, "Semanal"]}
               labelFormatter={(label) => `Semana del ${formatWeekDate(label)}`}
             />
             <Bar dataKey="weekly_net" radius={[4, 4, 0, 0]}>
@@ -75,7 +75,7 @@ export function AguaLocalClient({ updates }: Props) {
             <XAxis dataKey="week_date" tickFormatter={formatWeekDate} tick={{ fontSize: 11 }} />
             <YAxis tick={{ fontSize: 11 }} />
             <Tooltip
-              formatter={(value: number) => [`${value} instalaciones`, "Acumulado"]}
+              formatter={(value: any) => [`${value} instalaciones`, "Acumulado"]}
               labelFormatter={(label) => `Al ${formatWeekDate(label)}`}
             />
             <Bar dataKey="cumulative" fill="#00B4D8" radius={[4, 4, 0, 0]} />
