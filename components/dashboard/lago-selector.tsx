@@ -17,17 +17,21 @@ export function LagoSelector({ userId, currentLagoDay, groupMatchDays, isLocked 
   const [confirmed, setConfirmed] = useState<string | null>(currentLagoDay);
   const [saving, setSaving] = useState(false);
 
-  const formatDate = (d: string) => {
-    try {
-      const date = new Date(d); if (isNaN(date.getTime())) return d;
-      // Handle date-only strings (YYYY-MM-DD) by treating as local date
-      const [year, month, day] = d.split("-").map(Number);
-      const local = new Date(year, month - 1, day);
-      return local.toLocaleDateString("es-AR", { weekday: "short", day: "numeric", month: "short" });
-    } catch {
-      return d;
-    }
-  };
+const formatDate = (d: string) => {
+  try {
+    if (!d || typeof d !== "string") return String(d || "");
+    const parts = d.substring(0, 10).split("-");
+    if (parts.length !== 3) return d;
+    const year = parseInt(parts[0]);
+    const month = parseInt(parts[1]) - 1;
+    const day = parseInt(parts[2]);
+    if (isNaN(year) || isNaN(month) || isNaN(day)) return d;
+    const local = new Date(year, month, day);
+    return local.toLocaleDateString("es-AR", { weekday: "short", day: "numeric", month: "short" });
+  } catch {
+    return d;
+  }
+};
 
   const handleConfirm = async () => {
     if (!selected) return;
