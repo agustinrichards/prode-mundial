@@ -39,7 +39,7 @@ export function AguaLocalClient({ updates }: Props) {
             {lastUpdate?.weekly_net >= 0 ? "+" : ""}{lastUpdate?.weekly_net ?? 0}
           </p>
           <p className="text-xs text-gray-400 mt-1">
-            Semana {lastUpdate?.week_number} Â· {formatWeekDate(lastUpdate?.week_date)}
+            Semana {lastUpdate?.week_number} - {formatWeekDate(lastUpdate?.week_date)}
           </p>
         </div>
       </div>
