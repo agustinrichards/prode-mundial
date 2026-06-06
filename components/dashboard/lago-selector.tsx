@@ -19,7 +19,7 @@ export function LagoSelector({ userId, currentLagoDay, groupMatchDays, isLocked 
 
   const formatDate = (d: string) => {
     try {
-      const date = new Date(d);
+      const date = new Date(d); if (isNaN(date.getTime())) return d;
       // Handle date-only strings (YYYY-MM-DD) by treating as local date
       const [year, month, day] = d.split("-").map(Number);
       const local = new Date(year, month - 1, day);
