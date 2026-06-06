@@ -29,8 +29,14 @@ export default async function EspecialesPage() {
 
   // Todos los días del mundial con partidos (no solo grupos)
   const allMatchDays = await query("SELECT DISTINCT match_date::date AS d FROM matches ORDER BY d ASC");
-  const groupMatchDays = allMatchDays
-    .map((m: any) => toDateString(m.d))
+const groupMatchDays = allMatchDays
+    .map((m: any) => {
+      const val = m.d;
+      if (!val) return "";
+      if (typeof val === "string") return val.substring(0, 10);
+      if (val instanceof Date) return val.toISOString().substring(0, 10);
+      return String(val).substring(0, 10);
+    })
     .filter((d: string) => Boolean(d) && d.length === 10 && !isNaN(new Date(d + "T12:00:00").getTime()));
 
   const waterUpdates = await query("SELECT * FROM water_updates ORDER BY week_number ASC");
