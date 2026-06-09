@@ -101,7 +101,8 @@ function safeParseDate(val: string | null | undefined): Date | null {
 function formatMatchDate(val: string | null | undefined): string {
   const d = safeParseDate(val);
   if (!d) return "—";
-  return format(d, "EEE d MMM · HH:mm", { locale: es });
+  const fmt = new Intl.DateTimeFormat("es", { timeZone: "America/New_York", weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", hour12: false });
+  return fmt.format(d).replace(",", " ·");
 }
 
 export function MisApuestasClient({ myPredictions, allPredictions, specialBets, users, userId }: Props) {
