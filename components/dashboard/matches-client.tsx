@@ -409,6 +409,17 @@ const isClosed = (m: Match) => {
                     </div>
                   )}
 
+{locked && match.home_score === null && (match.co2_used || match.rio_used) && (
+  <div className="flex gap-2 mt-2 justify-center">
+    {match.co2_used && <span className="text-xs bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full font-medium">✓ CO2 x2</span>}
+    {match.rio_used && match.rio_home_pred !== null && (
+      <span className="text-xs bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full font-medium">
+        RIO · {match.rio_home_pred}-{match.rio_away_pred}
+      </span>
+    )}
+  </div>
+)}
+
                   {!closed && !locked && match.home_score === null && (
                     <div className="flex gap-2 mt-3 pt-3 border-t border-gray-100">
                       <button onClick={() => toggleComodin(match, "CO2")}
