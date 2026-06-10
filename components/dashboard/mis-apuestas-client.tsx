@@ -262,7 +262,7 @@ export function MisApuestasClient({ myPredictions, allPredictions, specialBets, 
                     <td className="px-3 py-3 hidden md:table-cell">
                       {b?.lago_day ? (() => {
                         const d = safeParseDate(b.lago_day);
-                        return d ? <span className="text-gray-700">{format(d, "d MMM", { locale: es })}</span> : <span className="text-gray-300">-</span>;
+                        return d ? <span className="text-gray-700">{format(new Date(d.toLocaleString("en-US", { timeZone: "America/New_York" })), "d MMM", { locale: es })}</span> : <span className="text-gray-300">-</span>;
                       })() : <span className="text-gray-300">-</span>}
                       {(b?.lago_bonus ?? 0) > 0 && <span className="ml-1.5 text-xs font-bold text-green-600">+{b.lago_bonus}</span>}
                     </td>
