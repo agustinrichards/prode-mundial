@@ -260,10 +260,12 @@ export function MisApuestasClient({ myPredictions, allPredictions, specialBets, 
                       {(b?.scorer_points ?? 0) > 0 && <span className="ml-1.5 text-xs font-bold text-green-600">+{b.scorer_points}</span>}
                     </td>
                     <td className="px-3 py-3 hidden md:table-cell">
-                      {b?.lago_day ? (() => {
-                        const d = safeParseDate(b.lago_day);
-                        return d ? <span className="text-gray-700">{format(new Date(d.toLocaleString("en-US", { timeZone: "America/New_York" })), "d MMM", { locale: es })}</span> : <span className="text-gray-300">-</span>;
-                      })() : <span className="text-gray-300">-</span>}
+                    {b?.lago_day ? (() => {
+  const parts = String(b.lago_day).substring(0, 10).split("-");
+  if (parts.length !== 3) return <span className="text-gray-300">-</span>;
+  const local = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+  return <span className="text-gray-700">{format(local, "d MMM", { locale: es })}</span>;
+})() : <span className="text-gray-300">-</span>}
                       {(b?.lago_bonus ?? 0) > 0 && <span className="ml-1.5 text-xs font-bold text-green-600">+{b.lago_bonus}</span>}
                     </td>
                     <td className="px-3 py-3 text-right hidden md:table-cell">
