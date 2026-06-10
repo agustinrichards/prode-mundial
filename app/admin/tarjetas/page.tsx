@@ -72,6 +72,7 @@ export default async function AdminTarjetasPage() {
         specialBets={serializedSpecialBets}
         users={users}
         userId={userId}
+        isAdmin={true}
       />
     </div>
   );

@@ -60,6 +60,7 @@ interface Props {
   specialBets: SpecialBet[];
   users: { id: string; display_name: string }[];
   userId: string;
+  isAdmin?: boolean;
 }
 
 const DATE_GROUPS = [
@@ -105,7 +106,7 @@ function formatMatchDate(val: string | null | undefined): string {
   return fmt.format(d).replace(",", " ·");
 }
 
-export function MisApuestasClient({ myPredictions, allPredictions, specialBets, users, userId }: Props) {
+export function MisApuestasClient({ myPredictions, allPredictions, specialBets, users, userId, isAdmin }: Props) {
   const [selectedUser, setSelectedUser] = useState<string>(userId);
   const [activeTab, setActiveTab] = useState("fecha_1");
 
@@ -246,7 +247,7 @@ export function MisApuestasClient({ myPredictions, allPredictions, specialBets, 
               {users.map(u => {
                 const b = specialByUser[u.id];
                 const isMe = u.id === userId;
-                if (!isMe && !fecha1Closed) return null;
+                if (!isMe && !fecha1Closed && !isAdmin) return null;
                 return (
                   <tr key={u.id} className={`border-t border-gray-50 ${isMe ? "bg-primary/5" : ""}`}>
                     <td className="px-4 py-3 font-medium">{u.display_name}{isMe && <span className="text-xs text-primary ml-1">(vos)</span>}</td>
