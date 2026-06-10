@@ -23,6 +23,7 @@ const adminLinks = [
   { href: '/admin/knockout', label: 'Equipos Clasif.', icon: Swords },
   { href: '/admin/special-results', label: 'Apuestas Especiales', icon: Trophy },
   { href: '/admin/water', label: 'Agua Local', icon: Droplets },
+{ href: '/admin/tarjetas', label: 'Ver Tarjetas', icon: Eye },
   { href: '/admin/users', label: 'Usuarios', icon: Users },
   { href: '/admin/settings', label: 'Config & Testing', icon: Settings },
 ];
