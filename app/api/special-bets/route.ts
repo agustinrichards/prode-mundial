@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
 
   // Verificar que el período fecha_1 esté abierto
   const period = await queryOne(
-    "SELECT is_open FROM betting_periods WHERE date_label = 'fecha_1'"
+    "SELECT is_open FROM betting_periods WHERE date_label = 'especiales'"
   );
   if (!period?.is_open) {
     return NextResponse.json({ error: "Plazo cerrado" }, { status: 403 });

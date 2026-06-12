@@ -24,7 +24,7 @@ export default async function EspecialesPage() {
   const specialBets = await queryOne("SELECT * FROM special_bets WHERE user_id=$1", [userId]);
 
   // Cierre basado en betting_periods de fecha_1
-  const period = await queryOne("SELECT is_open FROM betting_periods WHERE date_label='fecha_1'");
+  const period = await queryOne("SELECT is_open FROM betting_periods WHERE date_label='especiales'");
   const closed = period ? !period.is_open : true;
 
   // Todos los días del mundial con partidos (no solo grupos)
