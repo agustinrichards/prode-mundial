@@ -24,6 +24,7 @@ const adminLinks = [
   { href: '/admin/special-results', label: 'Apuestas Especiales', icon: Trophy },
   { href: '/admin/water', label: 'Agua Local', icon: Droplets },
 { href: '/admin/tarjetas', label: 'Ver Tarjetas', icon: Eye },
+{ href: '/leaderboard', label: 'Tabla de Posiciones', icon: BarChart3 },
   { href: '/admin/users', label: 'Usuarios', icon: Users },
   { href: '/admin/settings', label: 'Config & Testing', icon: Settings },
 ];
