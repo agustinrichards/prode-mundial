@@ -18,7 +18,7 @@ export default async function LeaderboardPage() {
     SELECT
       u.id AS user_id,
       u.display_name,
-      COALESCE(lc.total_points, 0) + COALESCE(sb_pts.special_points, 0) AS total_points,
+      COALESCE(lc.total_points, 0) AS total_points,
       COALESCE(sb_pts.special_points, 0) AS special_points,
       COUNT(p.id) FILTER (WHERE p.points IS NOT NULL) AS matches_predicted,
       -- Aciertos exactos: 3 pts base (con o sin CO2)
