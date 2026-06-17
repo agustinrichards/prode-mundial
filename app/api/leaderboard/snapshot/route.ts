@@ -14,27 +14,27 @@ export async function GET(req: NextRequest) {
     SELECT
       u.id AS user_id,
       u.display_name,
-      COALESCE(SUM(p.points) FILTER (WHERE p.points IS NOT NULL AND m.match_date::date <= $1::date), 0) +
+      COALESCE(SUM(p.points) FILTER (WHERE p.points IS NOT NULL AND (m.match_date AT TIME ZONE 'America/New_York')::date <= $1::date), 0) +
         COALESCE(sb_pts.special_points, 0) AS total_points,
       COALESCE(sb_pts.special_points, 0) AS special_points,
-      COUNT(p.id) FILTER (WHERE p.points IS NOT NULL AND m.match_date::date <= $1::date) AS matches_predicted,
+      COUNT(p.id) FILTER (WHERE p.points IS NOT NULL AND (m.match_date AT TIME ZONE 'America/New_York')::date <= $1::date) AS matches_predicted,
       COUNT(p.id) FILTER (
-        WHERE p.points IS NOT NULL AND m.match_date::date <= $1::date AND (
+        WHERE p.points IS NOT NULL AND (m.match_date AT TIME ZONE 'America/New_York')::date <= $1::date AND (
           CASE WHEN cu.match_id IS NOT NULL THEN p.points / 2 ELSE p.points END
         ) = 3
       ) AS exact_results,
       COUNT(p.id) FILTER (
-        WHERE p.points IS NOT NULL AND m.match_date::date <= $1::date AND (
+        WHERE p.points IS NOT NULL AND (m.match_date AT TIME ZONE 'America/New_York')::date <= $1::date AND (
           CASE WHEN cu.match_id IS NOT NULL THEN p.points / 2 ELSE p.points END
         ) = 2
       ) AS diff_results,
       COUNT(p.id) FILTER (
-        WHERE p.points IS NOT NULL AND m.match_date::date <= $1::date AND (
+        WHERE p.points IS NOT NULL AND (m.match_date AT TIME ZONE 'America/New_York')::date <= $1::date AND (
           CASE WHEN cu.match_id IS NOT NULL THEN p.points / 2 ELSE p.points END
         ) = 1
       ) AS simple_results,
       COALESCE(SUM(
-        CASE WHEN cu.match_id IS NOT NULL AND p.points IS NOT NULL AND m.match_date::date <= $1::date
+        CASE WHEN cu.match_id IS NOT NULL AND p.points IS NOT NULL AND (m.match_date AT TIME ZONE 'America/New_York')::date <= $1::date
         THEN p.points - (p.points / 2) ELSE 0 END
       ), 0) AS co2_points
     FROM leaderboard_snapshots ls
