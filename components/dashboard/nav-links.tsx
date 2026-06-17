@@ -24,6 +24,7 @@ const adminLinks = [
   { href: '/admin/special-results', label: 'Apuestas Especiales', icon: Trophy },
   { href: '/admin/water', label: 'Agua Local', icon: Droplets },
 { href: '/admin/tarjetas', label: 'Ver Tarjetas', icon: Eye },
+{ href: '/admin/lago', label: 'Puntos por Día', icon: BarChart3 },
 { href: '/leaderboard', label: 'Tabla de Posiciones', icon: BarChart3 },
   { href: '/admin/users', label: 'Usuarios', icon: Users },
   { href: '/admin/settings', label: 'Config & Testing', icon: Settings },
@@ -41,7 +42,7 @@ export function NavLinks({ isAdmin }: { isAdmin: boolean }) {
       {links.map(({ href, label, icon: Icon }) => (
         <Link key={href} href={href}
           className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
-            pathname === href ? "bg-primary/10 text-primary font-medium" : "text-gray-600 hover:bg-gray-100"
+            (pathname === href || pathname.startsWith(href + '/')) ? "bg-primary/10 text-primary font-medium" : "text-gray-600 hover:bg-gray-100"
           }`}>
           <Icon className="w-4 h-4 flex-shrink-0" />
           {label}
