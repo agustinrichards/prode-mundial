@@ -58,8 +58,10 @@ export default async function LeaderboardPage() {
     ORDER BY total_points DESC, exact_results DESC, u.display_name ASC
   `);
 
-  const snapshots = await query(`
-    SELECT DISTINCT snapshot_date FROM leaderboard_snapshots
+const snapshots = await query(`
+    SELECT DISTINCT (match_date AT TIME ZONE 'America/New_York')::date AS snapshot_date
+    FROM matches
+    WHERE home_score IS NOT NULL
     ORDER BY snapshot_date ASC
   `);
 
