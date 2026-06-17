@@ -33,7 +33,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       </aside>
 
       {/* Mobile header */}
-      <div className="md:hidden fixed top-0 left-0 right-0 z-50 px-4 py-3 flex items-center justify-between" style={{ backgroundColor: "#1D1D1B" }}>
+<div className="md:hidden fixed top-0 left-0 right-0 z-50 px-4 py-3 flex items-center justify-between" style={{ backgroundColor: "#1D1D1B" }}>
         <div>
           <div className="text-[8px] tracking-[0.2em] text-gray-400 uppercase leading-none">AGUA</div>
           <div style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 800, fontSize: "20px", letterSpacing: "-0.02em", color: "white" }}>
@@ -43,6 +43,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         <span style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "14px", letterSpacing: "0.12em", color: "#0077B6" }}>
           ⚽ PRODE 2026 · ADMIN
         </span>
+        <MobileMenu isAdmin={true} user={session.user} />
       </div>
 
       <main className="flex-1 md:ml-64 p-4 md:p-8 max-w-5xl mt-14 md:mt-0">
