@@ -1,6 +1,7 @@
 import { requireAdmin } from "@/lib/auth/session";
 import { NavLinks } from "@/components/dashboard/nav-links";
 import { UserMenu } from "@/components/dashboard/user-menu";
+import { MobileMenu } from "@/components/dashboard/mobile-menu";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const session = await requireAdmin();
