@@ -4,13 +4,17 @@ import { query } from "@/lib/db";
 export default async function AdminLagoPage() {
   await requireAdmin();
 
-  const rows = await query(`
+const rows = await query(`
     SELECT u.display_name,
-           (ds.match_date AT TIME ZONE 'America/New_York')::date AS dia,
-           ds.points
-    FROM daily_scores ds
-    JOIN users u ON u.id = ds.user_id
+           (m.match_date AT TIME ZONE 'America/New_York')::date AS dia,
+           COALESCE(SUM(p.points), 0) AS points
+    FROM users u
+    JOIN predictions p ON p.user_id = u.id
+    JOIN matches m ON m.id = p.match_id
     WHERE u.is_admin = FALSE
+    AND m.home_score IS NOT NULL
+    AND p.points IS NOT NULL
+    GROUP BY u.display_name, (m.match_date AT TIME ZONE 'America/New_York')::date
     ORDER BY dia ASC, u.display_name ASC
   `);
 
