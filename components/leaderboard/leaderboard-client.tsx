@@ -75,7 +75,7 @@ export function LeaderboardClient({ rows: initialRows, currentUserId, snapshots 
               className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
                 selectedDate === s.snapshot_date ? "bg-primary text-white" : "bg-white border border-gray-200 text-gray-600 hover:border-primary/40"
               }`}>
-              {format(parseISO(s.snapshot_date), "d MMM", { locale: es })}
+              {(() => { const p = s.snapshot_date.substring(0,10).split('-'); return new Date(parseInt(p[0]), parseInt(p[1])-1, parseInt(p[2])).toLocaleDateString('es-AR', { day: 'numeric', month: 'short' }); })()}
             </button>
           ))}
           <button onClick={() => loadSnapshot("current")}
