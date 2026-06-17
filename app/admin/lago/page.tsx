@@ -43,7 +43,7 @@ export default async function AdminLagoPage() {
               <th className="text-left px-4 py-3 font-semibold text-gray-600 sticky left-0 bg-gray-50">Jugador</th>
               {days.map(d => (
                 <th key={d} className="text-right px-3 py-3 font-semibold text-gray-600 whitespace-nowrap">
-                  {new Date(d + 'T12:00:00').toLocaleDateString('es-AR', { day: 'numeric', month: 'short' })}
+                  {(() => { const p = d.split('-'); return new Date(parseInt(p[0]), parseInt(p[1])-1, parseInt(p[2])).toLocaleDateString('es-AR', { day: 'numeric', month: 'short' }); })()}
                 </th>
               ))}
               <th className="text-right px-4 py-3 font-semibold text-gray-900">Total</th>
