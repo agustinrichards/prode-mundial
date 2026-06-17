@@ -15,12 +15,15 @@ export default async function AdminLagoPage() {
   `);
 
   const users = [...new Set(rows.map((r: any) => r.display_name))].sort();
-  const days = [...new Set(rows.map((r: any) => String(r.dia)))].sort();
+  const days = [...new Set(rows.map((r: any) => {
+    const d = r.dia instanceof Date ? r.dia.toISOString().substring(0, 10) : String(r.dia).substring(0, 10);
+    return d;
+  }))].sort();
 
   const matrix: Record<string, Record<string, number>> = {};
   for (const row of rows) {
     const user = row.display_name;
-    const day = String(row.dia);
+    const day = row.dia instanceof Date ? row.dia.toISOString().substring(0, 10) : String(row.dia).substring(0, 10);
     if (!matrix[user]) matrix[user] = {};
     matrix[user][day] = Number(row.points);
   }
