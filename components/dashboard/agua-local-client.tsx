@@ -18,10 +18,11 @@ interface Props {
 
 function formatWeekDate(val: string) {
   if (!val) return "";
-  const d = parseISO(val);
+  const parts = String(val).substring(0, 10).split("-");
+  if (parts.length !== 3) return val;
+  const d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
   return isValid(d) ? format(d, "d MMM", { locale: es }) : val;
 }
-
 export function AguaLocalClient({ updates }: Props) {
   const lastUpdate = updates[updates.length - 1];
 
