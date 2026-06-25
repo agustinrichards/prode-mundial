@@ -27,12 +27,12 @@ interface Props {
 
 // Viernes del Mundial 2026 + día de la final
 const WATER_DATES = [
-  { date: "2026-06-13", label: "Vie 13 Jun" },
-  { date: "2026-06-20", label: "Vie 20 Jun" },
-  { date: "2026-06-27", label: "Vie 27 Jun" },
-  { date: "2026-07-04", label: "Vie 4 Jul" },
-  { date: "2026-07-11", label: "Vie 11 Jul" },
-  { date: "2026-07-18", label: "Vie 18 Jul" },
+{ date: "2026-06-12", label: "Vie 12 Jun" },
+  { date: "2026-06-19", label: "Vie 19 Jun" },
+  { date: "2026-06-26", label: "Vie 26 Jun" },
+  { date: "2026-07-03", label: "Vie 3 Jul" },
+  { date: "2026-07-10", label: "Vie 10 Jul" },
+  { date: "2026-07-17", label: "Vie 17 Jul" },
   { date: "2026-07-20", label: "Dom 20 Jul · Final" },
 ];
 
