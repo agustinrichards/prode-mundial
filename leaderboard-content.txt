@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -27,13 +27,7 @@ interface Props {
   snapshots: Snapshot[];
 }
 
-const MEDALS = ["🥇", "🥈", "🥉"];
-
-const PERIOD_OPTIONS = [
-  { key: "fecha_1", label: "Fecha 1" },
-  { key: "fecha_2", label: "Fecha 2" },
-  { key: "fecha_3", label: "Fecha 3" },
-];
+const MEDALS = ["ðŸ¥‡", "ðŸ¥ˆ", "ðŸ¥‰"];
 
 export function LeaderboardClient({ rows: initialRows, currentUserId, snapshots }: Props) {
   const [rows, setRows] = useState(initialRows);
@@ -71,32 +65,11 @@ export function LeaderboardClient({ rows: initialRows, currentUserId, snapshots 
     }
   };
 
-const loadPeriod = async (periodKey: string) => {
-    setLoading(true);
-    setSelectedDate(periodKey);
-    try {
-      const res = await fetch(`/api/leaderboard/period?period=${periodKey}`);
-      const data = await res.json();
-      setRows(data.rows);
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-2 flex-wrap">
+      {snapshots.length > 0 && (
+        <div className="flex items-center gap-2 flex-wrap">
           <span className="text-sm text-gray-500">Ver tabla al:</span>
-          {PERIOD_OPTIONS.map(opt => (
-            <button key={opt.key} onClick={() => loadPeriod(opt.key)}
-              className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
-                selectedDate === opt.key ? "bg-primary text-white" : "bg-white border border-gray-200 text-gray-600 hover:border-primary/40"
-              }`}>
-              {opt.label}
-            </button>
-          ))}
           {snapshots.map(s => (
             <button key={s.snapshot_date} onClick={() => loadSnapshot(s.snapshot_date)}
               className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
@@ -110,8 +83,9 @@ const loadPeriod = async (periodKey: string) => {
               selectedDate === "current" ? "bg-primary text-white" : "bg-white border border-gray-200 text-gray-600 hover:border-primary/40"
             }`}>
             Hoy
-</button>
+          </button>
         </div>
+      )}
 
       <div className={`bg-white rounded-2xl border border-gray-200 overflow-hidden transition-opacity ${loading ? "opacity-50" : ""}`}>
         <table className="w-full text-sm">
@@ -146,10 +120,10 @@ const loadPeriod = async (periodKey: string) => {
                   <td className="px-3 py-3 text-right text-green-700 font-medium hidden lg:table-cell">{row.exact_results}</td>
                   <td className="px-3 py-3 text-right text-yellow-700 font-medium hidden lg:table-cell">{row.simple_results}</td>
                   <td className="px-3 py-3 text-right text-orange-600 hidden md:table-cell">
-                    {row.co2_points > 0 ? `+${row.co2_points}` : "—"}
+                    {row.co2_points > 0 ? `+${row.co2_points}` : "â€”"}
                   </td>
                   <td className="px-3 py-3 text-right text-purple-600 hidden md:table-cell">
-                    {row.special_points > 0 ? `+${row.special_points}` : "—"}
+                    {row.special_points > 0 ? `+${row.special_points}` : "â€”"}
                   </td>
                 </tr>
               );
