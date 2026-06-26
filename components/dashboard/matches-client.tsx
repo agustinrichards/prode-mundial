@@ -79,6 +79,7 @@ export function MatchesClient({ matches, userId, co2Usage, rioUsage, periods }: 
   const [activeTab, setActiveTab] = useState(TAB_GROUPS[0].key);
 
 const isClosed = (m: Match) => {
+  if ((m as any).manually_locked) return true;
   const period = periods.find(p => p.date_label === m.date_label);
   if (period) return !period.is_open;
   return true;

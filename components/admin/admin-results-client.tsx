@@ -16,6 +16,7 @@ interface Match {
   home_score: number | null;
   away_score: number | null;
   results_locked?: boolean;
+  manually_locked?: boolean;
 }
 
 const STAGE_LABELS: Record<string, string> = {
@@ -118,6 +119,21 @@ export function AdminResultsClient({ matches: initialMatches }: { matches: Match
     if (saved > 0) toast({ title: `✓ ${saved} resultados guardados y puntos calculados` });
   };
 
+  const toggleManualLock = async (matchId: string, currentlyLocked: boolean) => {
+    try {
+      const res = await fetch("/api/admin/match-lock", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ matchId, locked: !currentlyLocked }),
+      });
+      if (!res.ok) throw new Error((await res.json()).error);
+      setMatches(ms => ms.map(m => m.id === matchId ? { ...m, manually_locked: !currentlyLocked } : m));
+      toast({ title: !currentlyLocked ? "Partido bloqueado para jugadores" : "Partido desbloqueado" });
+    } catch (e: any) {
+      toast({ title: "Error", description: e.message, variant: "destructive" });
+    }
+  };
+
   const unlockMatch = async (matchId: string) => {
     try {
       const res = await fetch("/api/admin/unlock", {
@@ -209,7 +225,14 @@ export function AdminResultsClient({ matches: initialMatches }: { matches: Match
                         {format(parseISO(match.match_date), "d MMM · HH:mm", { locale: es })}
                       </span>
                     </div>
-                    <div className="flex items-center gap-2">
+<div className="flex items-center gap-2">
+                      <button onClick={() => toggleManualLock(match.id, !!match.manually_locked)}
+                        className={`text-xs flex items-center gap-1 transition-colors px-2 py-1 rounded-full ${
+                          match.manually_locked ? "bg-red-100 text-red-600" : "text-gray-400 hover:text-red-500"
+                        }`}>
+                        {match.manually_locked ? <Lock className="w-3 h-3" /> : <Unlock className="w-3 h-3" />}
+                        {match.manually_locked ? "Bloqueado" : "Bloquear"}
+                      </button>
                       {isLocked && (
                         <button onClick={() => unlockMatch(match.id)}
                           className="text-xs text-gray-400 hover:text-orange-500 flex items-center gap-1 transition-colors">
