@@ -23,7 +23,8 @@ interface Match {
   away_score_pred: number | null;
   points: number | null;
   prediction_id: string | null;
-  locked: boolean;
+locked: boolean;
+  manually_locked: boolean;
   co2_used: boolean;
   rio_used: boolean;
   rio_home_pred: number | null;
@@ -79,10 +80,7 @@ export function MatchesClient({ matches, userId, co2Usage, rioUsage, periods }: 
   const [activeTab, setActiveTab] = useState(TAB_GROUPS[0].key);
 
 const isClosed = (m: Match) => {
-  if ((m as any).manually_locked) return true;
-  const period = periods.find(p => p.date_label === m.date_label);
-  if (period) return !period.is_open;
-  return true;
+  return !!m.manually_locked;
 };
 
   const getInput = (m: Match) => inputs[m.id] ?? {

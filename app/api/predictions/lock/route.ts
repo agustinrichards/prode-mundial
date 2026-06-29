@@ -10,9 +10,9 @@ export async function POST(req: NextRequest) {
   const userId = (session.user as any).id;
   const { matchId } = await req.json();
 
-  const match = await queryOne("SELECT predictions_close_at FROM matches WHERE id=$1", [matchId]);
+const match = await queryOne("SELECT manually_locked FROM matches WHERE id=$1", [matchId]);
   if (!match) return NextResponse.json({ error: "Match not found" }, { status: 404 });
-  if (new Date(match.predictions_close_at) < new Date()) {
+  if (match.manually_locked) {
     return NextResponse.json({ error: "Predictions already closed" }, { status: 403 });
   }
 

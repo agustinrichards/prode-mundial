@@ -10,18 +10,13 @@ export async function POST(req: NextRequest) {
   const body = await req.json();
   const { matchId, homePred, awayPred, isRio } = body;
 
-  const match = await queryOne(
-    "SELECT id, date_label FROM matches WHERE id = $1",
+const match = await queryOne(
+    "SELECT id, manually_locked FROM matches WHERE id = $1",
     [matchId]
   );
   if (!match) return NextResponse.json({ error: "Match not found" }, { status: 404 });
 
-  // Check if period is open
-  const period = await queryOne(
-    "SELECT is_open FROM betting_periods WHERE date_label = $1",
-    [match.date_label]
-  );
-  if (!period?.is_open) {
+  if (match.manually_locked) {
     return NextResponse.json({ error: "Predictions closed" }, { status: 403 });
   }
 
