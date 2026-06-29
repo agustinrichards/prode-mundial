@@ -1,10 +1,10 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { parseISO } from "date-fns";
 
-const TEAMS = ["Argentina","Brasil","Francia","España","Alemania","Portugal","Países Bajos","Inglaterra","Bélgica","Uruguay","México","Canadá","Estados Unidos","Marruecos","Senegal","Japón","Corea del Sur","Croacia","Colombia","Ecuador","Suiza","Austria","Türkiye","Noruega","Suecia","Australia","Costa de Marfil","Sudáfrica","Ghana","Qatar","Bosnia y Herzegovina","Haití","Escocia","Paraguay","Curazao","Túnez","Egipto","Irán","Cabo Verde","Arabia Saudita","Iraq","Argelia","Jordania","RD Congo","Uzbekistán","Panamá","Nueva Zelanda"].sort();
+const TEAMS = ["Argentina","Brasil","Francia","EspaÃ±a","Alemania","Portugal","PaÃ­ses Bajos","Inglaterra","BÃ©lgica","Uruguay","MÃ©xico","CanadÃ¡","Estados Unidos","Marruecos","Senegal","JapÃ³n","Corea del Sur","Croacia","Colombia","Ecuador","Suiza","Austria","TÃ¼rkiye","Noruega","Suecia","Australia","Costa de Marfil","SudÃ¡frica","Ghana","Qatar","Bosnia y Herzegovina","HaitÃ­","Escocia","Paraguay","Curazao","TÃºnez","Egipto","IrÃ¡n","Cabo Verde","Arabia Saudita","Iraq","Argelia","Jordania","RD Congo","UzbekistÃ¡n","PanamÃ¡","Nueva Zelanda"].sort();
 
 const STAGE_LABELS: Record<string, string> = {
   round_of_32: "Ronda de 32",
@@ -56,7 +56,7 @@ export function AdminKnockoutClient({ matches }: { matches: Match[] }) {
     grouped[m.stage].push(m);
   }
 
-  const isPlaceholder = (name: string) => name.startsWith("Ganador") || name.startsWith("Perdedor") || name.startsWith("3ro") || name.startsWith("Segundo") || name.startsWith("Mejor");
+  const isPlaceholder = (name: string) => name.startsWith("Ganador") || name.startsWith("Perdedor") || name.startsWith("3ro") || name.startsWith("Segundo");
 
   return (
     <div className="space-y-6">
